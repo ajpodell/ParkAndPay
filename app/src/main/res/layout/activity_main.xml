@@ -17,7 +17,7 @@
         android:layout_below="@+id/pay_for_spot_button"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="111dp"
-        android:onClick="onClickPayForSpot" />
+        android:onClick="onClickSpotsTaken" />
 
     <Button
         android:layout_width="wrap_content"
