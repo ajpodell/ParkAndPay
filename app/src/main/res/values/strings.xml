@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ParkAndPay</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Activity Title Text Displays -->
+    <string name="title_activity_main">Choose View</string>
+    <string name="title_activity_spots_taken">Spots Taken</string>
+
+    <!-- Button Texts -->
+    <string name="refresh">Refresh</string>
+    <string name="button_spots_taken">See Spots</string>
+    <string name="button_pay_text">Pay</string>
+    <string name="title_activity_pay">PayActivity</string>
+    <string name="title_activity_select_spot">SelectSpotActivity</string>
+
+</resources>
