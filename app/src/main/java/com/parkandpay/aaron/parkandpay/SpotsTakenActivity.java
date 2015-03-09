@@ -124,6 +124,7 @@ public class SpotsTakenActivity extends ActionBarActivity {
         // parse query to get spot time info
         ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot");
         query.whereEqualTo("Lot", lot);
+        query.addAscendingOrder("SpotName");
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> parseObjects, ParseException e) {
                 if (e == null) {
