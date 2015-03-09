@@ -13,20 +13,25 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 
 public class PayActivity extends ActionBarActivity {
 
     private Date selectedTime;
     private Integer spotNum;
+    private static ParseObject selectedLot;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +54,19 @@ public class PayActivity extends ActionBarActivity {
         TextView textview = (TextView) findViewById(R.id.spot_num_text);
         textview.setText(spot_text);
         textview.setTextSize(40);
+
+
+
+        //janky get lot id - currently always lot 1
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingLot");
+        query.whereEqualTo("Lot_Name", "Lot_1");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> parseObjects, ParseException e) {
+                selectedLot = parseObjects.get(0);
+            }
+        });
+
     }
 
 
@@ -103,9 +121,11 @@ public class PayActivity extends ActionBarActivity {
                         ParseObject dataObject = new ParseObject("ParkingSpot");
                         dataObject.put("SpotName", spotNum.toString());
                         dataObject.put("PaidForUntil", selectedTime);
+                        dataObject.put("Lot", selectedLot); //
+
                         dataObject.saveInBackground(new SaveCallback() {
                             public void done(ParseException e) {
-                                if( e == null) {
+                                if (e == null) {
                                     // saved successfully
                                     Log.d("test", "parse object saved");
                                     Context context = getApplicationContext();
@@ -123,8 +143,7 @@ public class PayActivity extends ActionBarActivity {
 
                                     Toast toast = Toast.makeText(context, time, duration);
                                     toast.show();
-                                }
-                                else {
+                                } else {
                                     //did not save
                                     Log.d("error", e.toString());
                                 }
