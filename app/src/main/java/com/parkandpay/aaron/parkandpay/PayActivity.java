@@ -1,6 +1,7 @@
 package com.parkandpay.aaron.parkandpay;
 
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -10,10 +11,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.parse.Parse;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.SaveCallback;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -96,9 +101,35 @@ public class PayActivity extends ActionBarActivity {
 
                         //Wrap this in a function or something
                         ParseObject dataObject = new ParseObject("ParkingSpot");
-                        dataObject.put("SpotName", spotNum);
+                        dataObject.put("SpotName", spotNum.toString());
                         dataObject.put("PaidForUntil", selectedTime);
-                        dataObject.saveInBackground();
+                        dataObject.saveInBackground(new SaveCallback() {
+                            public void done(ParseException e) {
+                                if( e == null) {
+                                    // saved successfully
+                                    Log.d("test", "parse object saved");
+                                    Context context = getApplicationContext();
+
+                                    //make pretty time
+                                    //String time = selectedTime.toString();
+                                    SimpleDateFormat format = new SimpleDateFormat("MMM dd, hh:mm a");
+                                    String time = "Paid until: " + format.format(selectedTime);
+                                    //Date newDate = format.format(selectedTime);
+
+                                    //format = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
+                                    //String date = format.format(newDate);
+
+                                    int duration = Toast.LENGTH_LONG;
+
+                                    Toast toast = Toast.makeText(context, time, duration);
+                                    toast.show();
+                                }
+                                else {
+                                    //did not save
+                                    Log.d("error", e.toString());
+                                }
+                            }
+                        });
 
 
                     }
