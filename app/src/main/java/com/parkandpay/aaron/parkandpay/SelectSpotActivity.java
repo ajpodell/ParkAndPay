@@ -10,9 +10,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import java.util.Collections;
 import java.util.List;
-import java.lang.Integer;
+import java.util.Date;
 
 import com.parse.ParseQuery;
 import com.parse.ParseObject;
@@ -42,6 +44,8 @@ public class SelectSpotActivity extends ActionBarActivity {
         String currentLot = lot_name_c; // TODO - fix this hardcode
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot").whereEqualTo("Lot_Name", currentLot);
+        Date currentTime = new Date();
+        query.whereLessThan("PaidForUntil", currentTime);
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> objects, ParseException e) {
                 if (e == null) {

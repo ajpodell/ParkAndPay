@@ -52,7 +52,7 @@ public class PayActivity extends ActionBarActivity {
         //      THIS SPOT WILL EXPIRE AT "time"
 
         final TextView textview = (TextView) findViewById(R.id.spot_num_text);
-        textview.setText(spot_text);
+        textview.setText("Space #"+ spot_text);
         textview.setTextSize(40);
 
 
@@ -61,6 +61,7 @@ public class PayActivity extends ActionBarActivity {
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot");
         query.whereEqualTo("Lot_Name", selectedLot);
+        query.whereEqualTo("SpotName", spotNum);
 
         query.findInBackground(new FindCallback<ParseObject>() {
             //@Override
@@ -121,22 +122,13 @@ public class PayActivity extends ActionBarActivity {
                         tempTime.set(Calendar.MINUTE, minute);
                         selectedTime = tempTime.getTime();
 
+
                         Log.d("test", selectedTime.toString());
-
+                        SimpleDateFormat format = new SimpleDateFormat("MMM dd, hh:mm a");
                         // Probably want a confirmation here
-
-                        //Wrap this in a function or something
-                        /*
-                        ParseObject dataObject = new ParseObject("ParkingSpot");
-                        dataObject.put("SpotName", spotNum.toString());
-                        dataObject.put("PaidForUntil", selectedTime);
-                        dataObject.put("Lot_Name", selectedLot); //
-                        */
                         ParseObject dataObject = ParseObject.createWithoutData("ParkingSpot", selectedLotObj.getObjectId());
-                        //dataObject.put("SpotName", spotNum.toString());
-                        dataObject.put("PaidForUntil", selectedTime);
-                        //dataObject.put("Lot_Name", selectedLotObj.get("Lot_Name"));
 
+                        dataObject.put("PaidForUntil", selectedTime);
                         dataObject.saveInBackground(new SaveCallback() {
                             public void done(ParseException e) {
                                 if (e == null) {
@@ -146,11 +138,15 @@ public class PayActivity extends ActionBarActivity {
 
                                     //make pretty time
                                     SimpleDateFormat format = new SimpleDateFormat("MMM dd, hh:mm a");
-                                    String time = "Paid until: " + format.format(selectedTime);
+                                    String time = "Expires at: " + format.format(selectedTime);
 
                                     int duration = Toast.LENGTH_LONG;
-                                    Toast toast = Toast.makeText(context, time, duration);
+                                    Toast toast = Toast.makeText(context, "Payment Successful!\n"+time, duration);
                                     toast.show();
+
+                                    final TextView time_remaining_text = (TextView) findViewById(R.id.time_remaining_text);
+                                    time_remaining_text.setText(time);
+                                    time_remaining_text.setTextSize(32);
 
                                 } else {
                                     System.out.println(e.getMessage());
