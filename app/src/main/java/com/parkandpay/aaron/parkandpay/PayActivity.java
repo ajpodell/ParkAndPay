@@ -1,5 +1,6 @@
 package com.parkandpay.aaron.parkandpay;
 
+import android.app.Application;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import android.widget.Button;
 
 import com.parse.FindCallback;
 import com.parse.Parse;
@@ -30,7 +32,9 @@ public class PayActivity extends ActionBarActivity {
 
     private Date selectedTime;
     private String spotNum;
+    private String lotName;
     private static ParseObject selectedLotObj;
+    private static Button resetSpotButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,39 @@ public class PayActivity extends ActionBarActivity {
         Intent intent = getIntent();
         spotNum = intent.getStringExtra("spot_num");
         String selectedLot = intent.getStringExtra("lot_name");
+        lotName = selectedLot;
+        resetSpotButton = (Button) findViewById(R.id.resetSpotButton);
+
+        if(ApplicationConfig.hasSpot()) {
+
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot");
+            query.whereEqualTo("Lot_Name", selectedLot);
+            query.whereEqualTo("SpotName", spotNum);
+
+            query.findInBackground(new FindCallback<ParseObject>() {
+                //@Override
+                public void done(List<ParseObject> parseObjects, ParseException e) {
+                    if(e == null && parseObjects.size() > 0) {
+                        selectedLotObj = parseObjects.get(0);
+                        String expiration_time = selectedLotObj.get("PaidForUntil").toString();
+
+                        //SimpleDateFormat format = new SimpleDateFormat("MMM dd, hh:mm a");
+                        String time = "Expires at: " + expiration_time;
+
+                        final TextView time_remaining_text = (TextView) findViewById(R.id.time_remaining_text);
+                        time_remaining_text.setText(time);
+                        time_remaining_text.setTextSize(32);
+                    } else {
+                        System.out.println(e.getMessage());
+                        throw new RuntimeException();
+                    }
+                }
+            });
+
+
+        } else {
+            resetSpotButton.setVisibility(View.INVISIBLE);
+        }
 
         Log.d("debug", spotNum);
 
@@ -68,6 +105,30 @@ public class PayActivity extends ActionBarActivity {
             public void done(List<ParseObject> parseObjects, ParseException e) {
                 if(e == null && parseObjects.size() > 0) {
                     selectedLotObj = parseObjects.get(0);
+
+
+                    resetSpotButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            ParseObject dataObject = ParseObject.createWithoutData("ParkingSpot", selectedLotObj.getObjectId());
+
+                            dataObject.put("PaidForUntil", new Date());
+                            dataObject.saveInBackground(new SaveCallback() {
+                                public void done(ParseException e) {
+                                    if (e == null) {
+                                        ApplicationConfig.resetSpot();
+                                        Intent intent = new Intent(PayActivity.this, MainActivity.class);
+                                        startActivity(intent);
+                                    } else {
+                                        throw new RuntimeException();
+                                    }
+                                }
+                             });
+                        }
+
+                    });
+
                 } else {
                     System.out.println(e.getMessage());
                     throw new RuntimeException();
@@ -147,6 +208,11 @@ public class PayActivity extends ActionBarActivity {
                                     final TextView time_remaining_text = (TextView) findViewById(R.id.time_remaining_text);
                                     time_remaining_text.setText(time);
                                     time_remaining_text.setTextSize(32);
+
+                                    resetSpotButton.setVisibility(View.VISIBLE);
+
+                                    ApplicationConfig.setSpotTaken(spotNum);
+                                    ApplicationConfig.setLotName(lotName);
 
                                 } else {
                                     System.out.println(e.getMessage());

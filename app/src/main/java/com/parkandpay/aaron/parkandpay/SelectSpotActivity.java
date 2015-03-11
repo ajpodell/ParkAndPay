@@ -10,7 +10,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.Spinner;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,24 +27,36 @@ import java.util.ArrayList;
 
 public class SelectSpotActivity extends ActionBarActivity {
 
+    private static String first_lot_name_c = "l8W9nV5ami";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_spot);
 
-        createSpotList();
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String lot_name = parentView.getItemAtPosition(position).toString();
+                createSpotList(lot_name);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) { }
+
+        });
+
+        createSpotList(first_lot_name_c);
 
     }
 
-    private static String lot_name_c = "l8W9nV5ami";
-
-    public void createSpotList(){
+    public void createSpotList(final String lot_name){
         //create a list of strings
         final ListView listview = (ListView) findViewById(R.id.availSpotsListView);
         final ArrayList<String> list = new ArrayList<String>();
-        String currentLot = lot_name_c; // TODO - fix this hardcode
 
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot").whereEqualTo("Lot_Name", currentLot);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot").whereEqualTo("Lot_Name", lot_name);
         Date currentTime = new Date();
         query.whereLessThan("PaidForUntil", currentTime);
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -70,7 +83,7 @@ public class SelectSpotActivity extends ActionBarActivity {
 
                             Intent intent = new Intent(view.getContext(), PayActivity.class);
                             intent.putExtra("spot_num", item);
-                            intent.putExtra("lot_name", lot_name_c);
+                            intent.putExtra("lot_name", lot_name);
 
                             startActivity(intent);
 

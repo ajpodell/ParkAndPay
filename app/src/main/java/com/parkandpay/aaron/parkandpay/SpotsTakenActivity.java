@@ -22,7 +22,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-//Toast.makeText(getApplicationContext(), "testing123", Toast.LENGTH_SHORT).show();
 
 public class SpotsTakenActivity extends ActionBarActivity {
 
@@ -34,14 +33,12 @@ public class SpotsTakenActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spots_taken);
-        //Parse.enableLocalDatastore(this);
-        Parse.initialize(this, "D3e1FmZef0xReoXZlWFVGgxIosiuUfusQ9jgHT7y", "FFUhtwW99qsT4ExUj2kepUhKVAibc3MsMJYJGf2x");
     }
 
     @Override
     protected void onStart(){
         super.onStart();
-        populateSpinner();
+        // populateSpinner();
     }
 
     @Override
@@ -148,6 +145,7 @@ public class SpotsTakenActivity extends ActionBarActivity {
         });
     }
 
+    /*
     public void populateSpinner() {
         Spinner spinner = (Spinner) findViewById(R.id.lot_spinner);
         final List<ParseObject> lotObjects = new ArrayList<ParseObject>();
@@ -167,7 +165,7 @@ public class SpotsTakenActivity extends ActionBarActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, values);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-
+*/
 
 /*     custom spinner with objects stored
         final CustomSpinner adapter = new CustomSpinner(this, android.R.layout.simple_spinner_dropdown_item, lotObjects);
@@ -182,6 +180,6 @@ public class SpotsTakenActivity extends ActionBarActivity {
             public void onNothingSelected(AdapterView<?> parent) { }
         });
 */
-    }
+   // }
 
 }

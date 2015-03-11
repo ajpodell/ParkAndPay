@@ -1,8 +1,15 @@
 <resources>
-
-    <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+        <item name="android:spinnerDropDownItemStyle">@style/mySpinnerItemStyle</item>
+        <item name="android:spinnerStyle">@style/spinnerStyle</item>
+        <item name="android:spinnersShown">@style/spinnerStyle</item>
+    </style>
+
+    <style name="mySpinnerItemStyle" parent="@android:style/Widget.Holo.DropDownItem.Spinner">
+        <item name="android:textColor">@color/my_spinner_text_color</item>
+    </style>
+    <style name="spinnerStyle" parent="@android:style/Widget.Holo.Spinner">
+        <item name="android:textColor">@color/my_spinner_text_color</item>
     </style>
 
 </resources>
