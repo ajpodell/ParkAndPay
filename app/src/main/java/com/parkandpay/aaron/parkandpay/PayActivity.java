@@ -29,43 +29,51 @@ import java.util.List;
 public class PayActivity extends ActionBarActivity {
 
     private Date selectedTime;
-    private Integer spotNum;
-    private static ParseObject selectedLot;
+    private String spotNum;
+    private static ParseObject selectedLotObj;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pay);
-        Parse.initialize(getApplicationContext(), "D3e1FmZef0xReoXZlWFVGgxIosiuUfusQ9jgHT7y", "FFUhtwW99qsT4ExUj2kepUhKVAibc3MsMJYJGf2x");
-
 
         Intent intent = getIntent();
-        spotNum = intent.getIntExtra("spot_num", -1);
-        Log.d("debug", spotNum.toString());
+        spotNum = intent.getStringExtra("spot_num");
+        String selectedLot = intent.getStringExtra("lot_name");
+
+        Log.d("debug", spotNum);
 
         String spot_text = "Sorry, could not find your spot. Please try again.";
-        if(spotNum != -1) {
+        if(spotNum != null) {
             spot_text = spotNum.toString();
         }
 
         // ADD SOME TEXT THATS LIKE, THIS SPOT IS CURRENTLY EXPIRED OR
         //      THIS SPOT WILL EXPIRE AT "time"
 
-        TextView textview = (TextView) findViewById(R.id.spot_num_text);
+        final TextView textview = (TextView) findViewById(R.id.spot_num_text);
         textview.setText(spot_text);
         textview.setTextSize(40);
 
 
 
         //janky get lot id - currently always lot 1
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingLot");
-        query.whereEqualTo("Lot_Name", "Lot_1");
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot");
+        query.whereEqualTo("Lot_Name", selectedLot);
+
         query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
+            //@Override
             public void done(List<ParseObject> parseObjects, ParseException e) {
-                selectedLot = parseObjects.get(0);
+                if(e == null && parseObjects.size() > 0) {
+                    selectedLotObj = parseObjects.get(0);
+                } else {
+                    System.out.println(e.getMessage());
+                    throw new RuntimeException();
+                }
             }
         });
+
 
     }
 
@@ -118,10 +126,16 @@ public class PayActivity extends ActionBarActivity {
                         // Probably want a confirmation here
 
                         //Wrap this in a function or something
+                        /*
                         ParseObject dataObject = new ParseObject("ParkingSpot");
                         dataObject.put("SpotName", spotNum.toString());
                         dataObject.put("PaidForUntil", selectedTime);
-                        dataObject.put("Lot", selectedLot); //
+                        dataObject.put("Lot_Name", selectedLot); //
+                        */
+                        ParseObject dataObject = ParseObject.createWithoutData("ParkingSpot", selectedLotObj.getObjectId());
+                        //dataObject.put("SpotName", spotNum.toString());
+                        dataObject.put("PaidForUntil", selectedTime);
+                        //dataObject.put("Lot_Name", selectedLotObj.get("Lot_Name"));
 
                         dataObject.saveInBackground(new SaveCallback() {
                             public void done(ParseException e) {
@@ -131,20 +145,19 @@ public class PayActivity extends ActionBarActivity {
                                     Context context = getApplicationContext();
 
                                     //make pretty time
-                                    //String time = selectedTime.toString();
                                     SimpleDateFormat format = new SimpleDateFormat("MMM dd, hh:mm a");
                                     String time = "Paid until: " + format.format(selectedTime);
-                                    //Date newDate = format.format(selectedTime);
-
-                                    //format = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
-                                    //String date = format.format(newDate);
 
                                     int duration = Toast.LENGTH_LONG;
-
                                     Toast toast = Toast.makeText(context, time, duration);
                                     toast.show();
+
                                 } else {
+                                    System.out.println(e.getMessage());
+                                    System.out.println("Object: " + selectedLotObj.getObjectId());
                                     //did not save
+                                    Toast toast = Toast.makeText(getApplicationContext(), "Error: Unable to Buy Spot!", Toast.LENGTH_LONG);
+                                    toast.show();
                                     Log.d("error", e.toString());
                                 }
                             }
