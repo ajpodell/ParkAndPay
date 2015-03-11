@@ -10,8 +10,13 @@
         android:text="Pay"
         android:id="@+id/pay_for_spot_button"
         android:onClick="onClickPayForSpot"
-        android:background="#669900"
-        android:textSize="40dp" />
+        android:background="#ffa200"
+        android:textSize="40dp"
+        android:layout_margin="10dp"
+        android:layout_marginLeft="1dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginRight="1dp"
+        android:layout_marginBottom="1dp" />
 
     <Button android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,7 +24,8 @@
         android:text="View Spaces"
         android:id="@+id/button_spots_taken"
         android:onClick="onClickSpotsTaken"
-        android:background="#FF8800"
-        android:textSize="40dp" />
+        android:background="#094fc0"
+        android:textSize="40dp"
+        android:layout_margin="10dp" />
 
 </LinearLayout>
