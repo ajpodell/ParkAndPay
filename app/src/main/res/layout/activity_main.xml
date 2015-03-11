@@ -1,32 +1,31 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <TextView android:text="" android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_spots_taken"
-        android:id="@+id/button_spots_taken"
-        android:layout_below="@+id/pay_for_spot_button"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="111dp"
-        android:onClick="onClickSpotsTaken" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_pay_text"
+    <Button android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="Pay"
         android:id="@+id/pay_for_spot_button"
-        android:layout_below="@+id/textView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="149dp"
-        android:onClick="onClickPayForSpot" />
+        android:onClick="onClickPayForSpot"
+        android:background="#ffa200"
+        android:textSize="40dp"
+        android:layout_margin="10dp"
+        android:layout_marginLeft="1dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginRight="1dp"
+        android:layout_marginBottom="1dp" />
 
-</RelativeLayout>
+    <Button android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="View Spaces"
+        android:id="@+id/button_spots_taken"
+        android:onClick="onClickSpotsTaken"
+        android:background="#094fc0"
+        android:textSize="40dp"
+        android:layout_margin="10dp" />
+
+</LinearLayout>
