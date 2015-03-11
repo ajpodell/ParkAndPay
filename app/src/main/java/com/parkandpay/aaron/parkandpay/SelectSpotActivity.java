@@ -10,12 +10,21 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Date;
+
+import com.parse.ParseQuery;
+import com.parse.ParseObject;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 
 import java.util.ArrayList;
 
 
 public class SelectSpotActivity extends ActionBarActivity {
-    Integer NUM_VALUES = 40;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,33 +35,44 @@ public class SelectSpotActivity extends ActionBarActivity {
 
     }
 
-
+    private static String lot_name_c = "l8W9nV5ami";
 
     public void createSpotList(){
         //create a list of strings
         final ListView listview = (ListView) findViewById(R.id.availSpotsListView);
-        final ArrayList<Integer> list = new ArrayList<Integer>();
-        for (int i = 1; i <= NUM_VALUES; ++i) {
-            list.add(i);
-        }
-        final ArrayAdapter adapter = new ArrayAdapter(this,
-                android.R.layout.simple_list_item_1, list);
-        listview.setAdapter(adapter);
+        final ArrayList<String> list = new ArrayList<String>();
+        String currentLot = lot_name_c; // TODO - fix this hardcode
 
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot").whereEqualTo("Lot_Name", currentLot);
+        Date currentTime = new Date();
+        query.whereLessThan("PaidForUntil", currentTime);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (e == null) {
+                    for (int i = 0; i < objects.size(); ++i) {
+                        list.add(objects.get(i).getString("SpotName"));
+                    }
+                    // Sort spot numbers
+                    Collections.sort(list);
+
+                    final ArrayAdapter adapter = new ArrayAdapter(SelectSpotActivity.this,
+                            android.R.layout.simple_list_item_1, list);
+                    listview.setAdapter(adapter);
+
+                    listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 
-            @Override
-            public void onItemClick(AdapterView<?> parent, final View view,
-                                    int position, long id) {
-                final Integer item = (Integer) parent.getItemAtPosition(position);
-                Log.d("debug", item.toString());
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, final View view,
+                                                int position, long id) {
+                            final String item = parent.getItemAtPosition(position).toString();
+                            Log.d("debug", item);
 
-                Intent intent = new Intent(view.getContext(), PayActivity.class);
-                intent.putExtra("spot_num", item);
+                            Intent intent = new Intent(view.getContext(), PayActivity.class);
+                            intent.putExtra("spot_num", item);
+                            intent.putExtra("lot_name", lot_name_c);
 
-
-                startActivity(intent);
+                            startActivity(intent);
 
                 /*
                 view.animate().setDuration(2000).alpha(0)
@@ -65,8 +85,13 @@ public class SelectSpotActivity extends ActionBarActivity {
                             }
                         });
                        */
-            }
+                        }
 
+                    });
+                } else {
+                    // throw new RuntimeException();
+                }
+            }
         });
     }
 
