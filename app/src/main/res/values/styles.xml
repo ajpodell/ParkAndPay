@@ -1,15 +1,33 @@
 <resources>
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="android:spinnerDropDownItemStyle">@style/mySpinnerItemStyle</item>
-        <item name="android:spinnerStyle">@style/spinnerStyle</item>
-        <item name="android:spinnersShown">@style/spinnerStyle</item>
+    <style name="AppTheme" parent="Theme.AppCompat">
+        <item name="android:textColor">@color/michigan_maize</item>
+        <item name="android:typeface">monospace</item>
+        <item name="android:background">@color/law_quad_stone</item>
+        <item name="android:actionBarStyle">@style/action_bar_style</item>
+        <item name="android:button">@style/button_style</item>
+        <!--<item name="android:spinnerDropDownItemStyle">@style/mySpinnerItemStyle</item>-->
+        <!--<item name="android:spinnerStyle">@style/allSpinnerStyle</item>-->
+        <!--<item name="android:spinnersShown">@style/allSpinnerShown</item>-->
+    </style>
+    <style name="action_bar_style" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/expanded_dark_gray</item>
+        <item name="android:textColor">@color/michigan_maize</item>
+        <item name="android:text">@string/app_name</item>
     </style>
 
-    <style name="mySpinnerItemStyle" parent="@android:style/Widget.Holo.DropDownItem.Spinner">
-        <item name="android:textColor">@color/my_spinner_text_color</item>
+    <style name="button_style" parent="Widget.AppCompat.ActionButton">
+        <item name="android:background">@color/expanded_dark_gray</item>
+        <item name="android:textColor">@color/michigan_maize</item>
     </style>
-    <style name="spinnerStyle" parent="@android:style/Widget.Holo.Spinner">
-        <item name="android:textColor">@color/my_spinner_text_color</item>
+
+    <style name="mySpinnerItemStyle" parent="Widget.AppCompat.DropDownItem.Spinner">
+        <item name="android:textColor">@color/michigan_maize</item>
+    </style>
+    <style name="allSpinnerStyle" parent="@android:style/Widget.Holo.Spinner">
+        <item name="android:textColor">@color/michigan_maize</item>
+    </style>
+    <style name="allSpinnerShown" parent="@android:style/Widget.Holo.Spinner">
+        <item name="android:textColor">@color/michigan_maize</item>
     </style>
 
 </resources>

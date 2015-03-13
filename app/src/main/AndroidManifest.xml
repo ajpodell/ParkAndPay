@@ -12,8 +12,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,15 +21,15 @@
         </activity>
         <activity
             android:name=".SpotsTakenActivity"
-            android:label="@string/title_activity_spots_taken"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity"
+            >
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.parkandpay.aaron.parkandpay.MainActivity" />
         </activity>
         <activity
             android:name=".PayActivity"
-            android:label="@string/title_activity_pay"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -38,7 +37,6 @@
         </activity>
         <activity
             android:name=".SelectSpotActivity"
-            android:label="@string/title_activity_select_spot"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

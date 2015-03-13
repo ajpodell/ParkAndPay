@@ -13,11 +13,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/spinner"
         android:entries="@array/lot_names_array"
-        android:textColor="#000000"
+        android:textColor="#ff786b00"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        style="@style/spinnerStyle"
-        android:background="#00f2ecef" />
+        android:layout_centerHorizontal="true"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
