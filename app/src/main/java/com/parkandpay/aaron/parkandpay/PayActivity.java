@@ -1,6 +1,5 @@
 package com.parkandpay.aaron.parkandpay;
 
-import android.app.Application;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -13,10 +12,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
-import android.widget.Button;
 
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -35,6 +32,7 @@ public class PayActivity extends ActionBarActivity {
     private String lotName;
     private static ParseObject selectedLotObj;
     private static TextView resetSpotButton;
+    private static TextView cost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +44,11 @@ public class PayActivity extends ActionBarActivity {
         String selectedLot = intent.getStringExtra("lot_name");
         lotName = selectedLot;
         resetSpotButton = (TextView) findViewById(R.id.resetSpotButton);
+        cost = (TextView) findViewById(R.id.cost);
 
         if(ApplicationConfig.hasSpot()) {
+            cost.setVisibility(View.INVISIBLE);
+
 
             ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot");
             query.whereEqualTo("Lot_Name", selectedLot);
@@ -74,6 +75,10 @@ public class PayActivity extends ActionBarActivity {
 
 
         } else {
+            cost.setVisibility(View.VISIBLE);
+            final TextView cost_text = (TextView) findViewById(R.id.cost);
+            cost_text.setText("$0.00");
+
             resetSpotButton.setVisibility(View.INVISIBLE);
             selectedTime = Calendar.getInstance().getTime();
             SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
@@ -86,7 +91,7 @@ public class PayActivity extends ActionBarActivity {
 
         String spot_text = "Sorry, could not find your spot. Please try again.";
         if(spotNum != null) {
-            spot_text = spotNum.toString();
+            spot_text = spotNum;
         }
 
         // ADD SOME TEXT THATS LIKE, THIS SPOT IS CURRENTLY EXPIRED OR
@@ -99,7 +104,7 @@ public class PayActivity extends ActionBarActivity {
         date_text.setText(date);
 
         final TextView textview = (TextView) findViewById(R.id.spot_num_text);
-        textview.setText(selectedLot + " Parking Space #"+ spot_text);
+        textview.setText(selectedLot + " Parking Space #" + spot_text);
 
 
 
@@ -197,6 +202,13 @@ public class PayActivity extends ActionBarActivity {
                     String time = timeFormat.format(selectedTime);
                     final TextView time_remaining_text = (TextView) findViewById(R.id.time_remaining_text);
                     time_remaining_text.setText(time);
+
+                    double cost_value = 0.70*Math.ceil(((double) ((selectedTime.getTime() - Calendar.getInstance().getTimeInMillis())/(1000 * 60))) / 30);
+                    if(cost_value < 0) {
+                        cost_value = 0;
+                    }
+                    final TextView cost_text = (TextView) findViewById(R.id.cost);
+                    cost_text.setText("$" + String.format("%.2f", cost_value));
                 }
             }, curHour, curMinute, false);
         tpd.show();

@@ -22,7 +22,7 @@
     <TextView
         android:onClick="onClickAddTime"
         android:clickable="true"
-        android:text=" 00:00 AM"
+        android:text="00:00 AM"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/time_remaining_text"
@@ -64,7 +64,17 @@
         android:textColor="@color/observatory_white"
         android:layout_below="@+id/availSpotsListView"
         android:paddingTop="25dp"
-        android:textSize="24dp"
+        android:textSize="24sp"
         android:textIsSelectable="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="$"
+        android:id="@+id/cost"
+        android:layout_below="@+id/resetSpotButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:textSize="50sp"/>
 
 </RelativeLayout>
