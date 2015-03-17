@@ -73,6 +73,7 @@ public class PayActivity extends ActionBarActivity {
         } else {
             costView.setVisibility(View.VISIBLE);
             costView.setText("$0.00");
+            cost_value = 0;
             resetSpotButton.setVisibility(View.INVISIBLE);
             selectedTime = Calendar.getInstance().getTime();
             selectTimeButton.setText(new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
@@ -211,7 +212,8 @@ public class PayActivity extends ActionBarActivity {
                                 Log.d("error", e.toString());
                             }
                         }
-                    });                    }
+                    });
+                }
             });
 
         // cancel button: will NOT send payment data to parse
