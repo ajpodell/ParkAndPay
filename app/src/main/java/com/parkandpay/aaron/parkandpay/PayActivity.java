@@ -2,7 +2,6 @@ package com.parkandpay.aaron.parkandpay;
 
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
@@ -25,7 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
+import java.util.Locale;
 
 public class PayActivity extends ActionBarActivity {
 
@@ -34,7 +33,8 @@ public class PayActivity extends ActionBarActivity {
     private String lotName;
     private static ParseObject selectedLotObj;
     private static TextView resetSpotButton;
-    private static TextView cost;
+    private static TextView costView;
+    private static TextView selectTimeButton;
     private static double cost_value;
 
     @Override
@@ -42,34 +42,26 @@ public class PayActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pay);
 
+        // initialize all clickable buttons and text views that are used in multiple functions
         Intent intent = getIntent();
         spotNum = intent.getStringExtra("spot_num");
-        String selectedLot = intent.getStringExtra("lot_name");
-        lotName = selectedLot;
+        lotName = intent.getStringExtra("lot_name");
         resetSpotButton = (TextView) findViewById(R.id.resetSpotButton);
-        cost = (TextView) findViewById(R.id.cost);
+        costView = (TextView) findViewById(R.id.cost);
+        selectTimeButton = (TextView) findViewById(R.id.time_remaining_text);
 
+        // if the user has already paid for a spot, use the information from that to populate text fields
         if(ApplicationConfig.hasSpot()) {
-            cost.setVisibility(View.INVISIBLE);
-
+            costView.setVisibility(View.INVISIBLE);
 
             ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot");
-            query.whereEqualTo("Lot_Name", selectedLot);
+            query.whereEqualTo("Lot_Name", lotName);
             query.whereEqualTo("SpotName", spotNum);
-
             query.findInBackground(new FindCallback<ParseObject>() {
-                //@Override
                 public void done(List<ParseObject> parseObjects, ParseException e) {
                     if(e == null && parseObjects.size() > 0) {
-                        selectedLotObj = parseObjects.get(0);
-                        Date expiration_time = (Date) selectedLotObj.get("PaidForUntil");
-                        selectedTime = expiration_time;
-
-                        SimpleDateFormat format = new SimpleDateFormat("hh:mm a");
-                        String time = format.format(expiration_time);
-
-                        final TextView time_remaining_text = (TextView) findViewById(R.id.time_remaining_text);
-                        time_remaining_text.setText(time);
+                        selectedTime = (Date) selectedLotObj.get("PaidForUntil");
+                        selectTimeButton.setText(new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
                     } else {
                         System.out.println(e.getMessage());
                         throw new RuntimeException();
@@ -77,61 +69,40 @@ public class PayActivity extends ActionBarActivity {
                 }
             });
 
-
+        // if the user has not paid for a spot, populate text fields with default information
         } else {
-            cost.setVisibility(View.VISIBLE);
-            final TextView cost_text = (TextView) findViewById(R.id.cost);
-            cost_text.setText("$0.00");
-
+            costView.setVisibility(View.VISIBLE);
+            costView.setText("$0.00");
             resetSpotButton.setVisibility(View.INVISIBLE);
             selectedTime = Calendar.getInstance().getTime();
-            SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
-            String time = timeFormat.format(selectedTime);
-            final TextView time_remaining_text = (TextView) findViewById(R.id.time_remaining_text);
-            time_remaining_text.setText(time);
+            selectTimeButton.setText(new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
         }
 
         Log.d("debug", spotNum);
-
         String spot_text = "Sorry, could not find your spot. Please try again.";
         if(spotNum != null) {
             spot_text = spotNum;
         }
 
-        // ADD SOME TEXT THATS LIKE, THIS SPOT IS CURRENTLY EXPIRED OR
-        //      THIS SPOT WILL EXPIRE AT "time"
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd");
-        Calendar c = Calendar.getInstance();
-        String date = dateFormat.format(c.getTime());
-        final TextView date_text = (TextView) findViewById(R.id.date_text);
-        date_text.setText(date);
-
-        final TextView textview = (TextView) findViewById(R.id.spot_num_text);
-        textview.setText(selectedLot + " Parking Space #" + spot_text);
-
-
+        // set the date and the space number
+        ((TextView) findViewById(R.id.date_text)).setText(new SimpleDateFormat("MMMM dd", Locale.US).format(Calendar.getInstance().getTime()));
+        ((TextView) findViewById(R.id.spot_num_text)).setText(lotName + " Parking Space #" + spot_text);
 
         //janky get lot id - currently always lot 1
-
+        // TODO: Someone add comments to explain what's going on here!
         ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot");
-        query.whereEqualTo("Lot_Name", selectedLot);
+        query.whereEqualTo("Lot_Name", lotName);
         query.whereEqualTo("SpotName", spotNum);
-
         query.findInBackground(new FindCallback<ParseObject>() {
-            //@Override
             public void done(List<ParseObject> parseObjects, ParseException e) {
                 if(e == null && parseObjects.size() > 0) {
                     selectedLotObj = parseObjects.get(0);
-
                 } else {
                     System.out.println(e.getMessage());
                     throw new RuntimeException();
                 }
             }
         });
-
-
     }
 
     @Override
@@ -156,99 +127,56 @@ public class PayActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onClickReset(View view) {
-        AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-        builder1.setMessage("Are you sure you want to cancel your reservation?");
-
-        builder1.setCancelable(true);
-        builder1.setPositiveButton("Yes",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        ParseObject dataObject = ParseObject.createWithoutData("ParkingSpot", selectedLotObj.getObjectId());
-
-                        dataObject.put("PaidForUntil", new Date());
-                        dataObject.saveInBackground(new SaveCallback() {
-                            public void done(ParseException e) {
-                                if (e == null) {
-                                    ApplicationConfig.resetSpot();
-                                    Intent intent = new Intent(PayActivity.this, MainActivity.class);
-                                    startActivity(intent);
-                                } else {
-                                    throw new RuntimeException();
-                                }
-                            }
-                        });
-
-                    }
-                });
-
-        builder1.setNegativeButton("No",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-
-        AlertDialog alert11 = builder1.create();
-        alert11.show();
-    }
-
+    // TODO: add different functionality to allow a user to add time to an already purchased space don't charge them more for it.
     public void onClickAddTime(View view) {
         Log.d("test", "add time button clicked");
 
+        // Creates Calendar dialog
         final Calendar c = Calendar.getInstance();
-        int curHour = c.get(Calendar.HOUR_OF_DAY);
+        Integer curHour = c.get(Calendar.HOUR_OF_DAY);
         Integer curMinute = c.get(Calendar.MINUTE);
         TimePickerDialog tpd = new TimePickerDialog(this,
             new TimePickerDialog.OnTimeSetListener() {
 
                 @Override
-                public void onTimeSet(TimePicker view, int hourOfDay,
-                                      int minute) {
+                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                     // this is an async callback
                     Log.d("test", "should be second: " + Integer.toString(hourOfDay));
                     Log.d("test", selectedTime.toString());
 
-                    selectedTime = new Date();
                     Calendar tempTime = Calendar.getInstance();
                     tempTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
                     tempTime.set(Calendar.MINUTE, minute);
                     selectedTime = tempTime.getTime();
+                    selectTimeButton.setText(new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
 
-                    SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
-                    String time = timeFormat.format(selectedTime);
-                    final TextView time_remaining_text = (TextView) findViewById(R.id.time_remaining_text);
-                    time_remaining_text.setText(time);
-
+                    // calculates cost based on the difference of the selected time and the current time.
                     cost_value = 0.70*Math.ceil(((double) ((selectedTime.getTime() - Calendar.getInstance().getTimeInMillis())/(1000 * 60))) / 30);
                     if(cost_value < 0) {
                         cost_value = 0;
                     }
-                    final TextView cost_text = (TextView) findViewById(R.id.cost);
-                    cost_text.setText("$" + String.format("%.2f", cost_value));
+                    costView.setText("$" + String.format("%.2f", cost_value));
                 }
+
             }, curHour, curMinute, false);
         tpd.show();
     }
 
     public void onClickPay(View view) {
         Log.d("test", "pay button clicked");
-        //make pretty time
-        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd");
-        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("MMMM dd, hh:mm a");
-        final String dateTime = "Expires at: " + dateTimeFormat.format(selectedTime);
 
-        AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-        builder1.setTitle("Payment Details");
-        builder1.setMessage("lot name: " + lotName +
+        // Fields for the confirmation dialog
+        AlertDialog.Builder confirmationDialog = new AlertDialog.Builder(this);
+        confirmationDialog.setTitle("Payment Details");
+        confirmationDialog.setMessage("lot name: " + lotName +
                 "\nspace: " + spotNum +
-                "\ndate: " + dateFormat.format(selectedTime) +
-                "\nexpiration time: " + timeFormat.format(selectedTime) +
+                "\ndate: " + new SimpleDateFormat("MMMM dd", Locale.US).format(selectedTime) +
+                "\nexpiration time: " + new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime) +
                 "\n\ncost: $" + String.format("%.2f", cost_value));
+        confirmationDialog.setCancelable(true);
 
-        builder1.setCancelable(true);
-        builder1.setPositiveButton("Confirm",
+        // The confirm button: will send data to parse if payment is confirmed
+        confirmationDialog.setPositiveButton("Confirm",
             new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     ParseObject dataObject = ParseObject.createWithoutData("ParkingSpot", selectedLotObj.getObjectId());
@@ -259,13 +187,17 @@ public class PayActivity extends ActionBarActivity {
                             if (e == null) {
                                 // saved successfully
                                 Log.d("test", "parse object saved");
-                                Context context = getApplicationContext();
-
-                                int duration = Toast.LENGTH_LONG;
-                                Toast toast = Toast.makeText(context, "Payment Successful!\n"+dateTime, duration);
-                                toast.show();
 
                                 resetSpotButton.setVisibility(View.VISIBLE);
+
+//                                Context context = getApplicationContext();
+//
+//                                int duration = Toast.LENGTH_LONG;
+//                                Toast toast = Toast.makeText(context, "Payment Successful!\n" +
+//                                        "Expires at: " + new SimpleDateFormat("MMMM dd, hh:mm a",
+//                                        Locale.US).format(selectedTime), duration);
+//                                toast.show();
+
 
                                 ApplicationConfig.setSpotTaken(spotNum);
                                 ApplicationConfig.setLotName(lotName);
@@ -281,15 +213,52 @@ public class PayActivity extends ActionBarActivity {
                         }
                     });                    }
             });
-        builder1.setNegativeButton("Cancel",
+
+        // cancel button: will NOT send payment data to parse
+        confirmationDialog.setNegativeButton("Cancel",
             new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     dialog.cancel();
                 }
             });
+        confirmationDialog.create().show();
+    }
 
-        AlertDialog alert11 = builder1.create();
-        alert11.show();
+    public void onClickReset(View view) {
 
+        // fields for the reset dialog
+        AlertDialog.Builder resetDialog = new AlertDialog.Builder(this);
+        resetDialog.setMessage("Are you sure you want to cancel your reservation?");
+        resetDialog.setCancelable(true);
+
+        // if yes is selected, will cancel payment and update parse information
+        resetDialog.setPositiveButton("Yes",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                    ParseObject dataObject = ParseObject.createWithoutData("ParkingSpot", selectedLotObj.getObjectId());
+                    dataObject.put("PaidForUntil", new Date());
+                    dataObject.saveInBackground(new SaveCallback() {
+                        public void done(ParseException e) {
+                            if (e == null) {
+                                ApplicationConfig.resetSpot();
+                                startActivity(new Intent(PayActivity.this, MainActivity.class));
+                            } else {
+                                throw new RuntimeException();
+                            }
+                        }
+                    });
+
+                }
+            });
+
+        // if no is selected, not update parse information
+        resetDialog.setNegativeButton("No",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.cancel();
+                }
+            });
+        resetDialog.create().show();
     }
 }

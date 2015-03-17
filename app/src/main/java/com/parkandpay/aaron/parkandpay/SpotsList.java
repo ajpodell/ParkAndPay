@@ -16,6 +16,7 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class SpotsList extends ArrayAdapter<String> {
     private final Context context;
@@ -39,19 +40,19 @@ public class SpotsList extends ArrayAdapter<String> {
         Bundle temp_spot = (Bundle) info.get(pos.toString());
 
         //SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm aa");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm aa");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm aa", Locale.US);
         String str = dateFormat.format(((Calendar) temp_spot.get("time")).getTime());
 
 
         if (temp_spot.getBoolean("gets_ticket")) {
-            imageView.setImageResource(R.drawable.unpaid_icon);
-            textView.setText(temp_spot.getString("name") + " is unpaid for!" );
+            imageView.setImageResource(R.drawable.x_icon);
+            textView.setText(temp_spot.getString("name") + " is unpaid for!");
             textView.setTextColor(Color.RED);
         }
         else {
-            imageView.setImageResource(R.drawable.paid_icon);
+            imageView.setImageResource(R.drawable.check_icon);
             textView.setText(temp_spot.getString("name") + " is paid for until " + str);
-            textView.setTextColor(Color.BLUE);
+            textView.setTextColor(Color.YELLOW);
         }
 
         return rowView;
