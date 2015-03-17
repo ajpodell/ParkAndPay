@@ -88,9 +88,15 @@ public class PayActivity extends ActionBarActivity {
         // ADD SOME TEXT THATS LIKE, THIS SPOT IS CURRENTLY EXPIRED OR
         //      THIS SPOT WILL EXPIRE AT "time"
 
+        //TODO: add today's date here!
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd");
+//        String date = dateFormat.format(selectedTime);
+//        final TextView date_text = (TextView) findViewById(R.id.date_text);
+//        date_text.setText(date);
+
         final TextView textview = (TextView) findViewById(R.id.spot_num_text);
-        textview.setText("Space #"+ spot_text);
-        textview.setTextSize(40);
+        textview.setText(selectedLot + " Space #"+ spot_text);
+        textview.setTextSize(30);
 
 
 

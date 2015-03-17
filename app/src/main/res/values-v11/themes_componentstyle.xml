@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="ComponentStyle" parent="Theme.AppCompat">
+
+    <item name="android:editTextBackground">@drawable/componentstyle_edit_text_holo_dark</item>
+
+    <item name="android:textColorHighlight">#99ffcb05</item>
+    <item name="android:textSelectHandleLeft">@drawable/componentstyle_text_select_handle_left</item>
+    <item name="android:textSelectHandleRight">@drawable/componentstyle_text_select_handle_right</item>
+    <item name="android:textSelectHandle">@drawable/componentstyle_text_select_handle_middle</item>
+
+    <item name="android:listChoiceIndicatorMultiple">@drawable/componentstyle_btn_check_holo_dark</item>
+
+    <item name="android:buttonStyle">@style/ButtonComponentStyle</item>
+
+    <item name="android:imageButtonStyle">@style/ImageButtonComponentStyle</item>
+
+    <item name="android:dropDownSpinnerStyle">@style/SpinnerComponentStyle</item>
+
+    <item name="android:buttonStyleToggle">@style/ToggleComponentStyle</item>
+
+    <item name="android:listChoiceBackgroundIndicator">@drawable/componentstyle_list_selector_holo_dark</item>
+
+    <item name="android:activatedBackgroundIndicator">@drawable/componentstyle_activated_background_holo_dark</item>
+
+    <item name="android:fastScrollThumbDrawable">@drawable/componentstyle_fastscroll_thumb_holo</item>
+
+  </style>
+
+</resources>

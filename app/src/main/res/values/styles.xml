@@ -1,5 +1,5 @@
 <resources>
-    <style name="AppTheme" parent="Theme.AppCompat">
+    <style name="AppTheme" parent="@style/Theme.AppCompat">
         <item name="android:textColor">@color/michigan_maize</item>
         <item name="android:typeface">monospace</item>
         <item name="android:background">@color/law_quad_stone</item>
@@ -9,14 +9,15 @@
         <!--<item name="android:spinnerStyle">@style/allSpinnerStyle</item>-->
         <!--<item name="android:spinnersShown">@style/allSpinnerShown</item>-->
     </style>
-    <style name="action_bar_style" parent="Widget.AppCompat.ActionBar">
+
+    <style name="action_bar_style" parent="@style/Widget.AppCompat.ActionBar">
         <item name="android:background">@color/expanded_dark_gray</item>
         <item name="android:textColor">@color/michigan_maize</item>
         <item name="android:text">@string/app_name</item>
     </style>
 
-    <style name="button_style" parent="Widget.AppCompat.ActionButton">
-        <item name="android:background">@color/expanded_dark_gray</item>
+    <style name="button_style" parent="@style/Widget.AppCompat.ActionButton">
+        <item name="android:background">@color/michigan_maize</item>
         <item name="android:textColor">@color/michigan_maize</item>
     </style>
 
