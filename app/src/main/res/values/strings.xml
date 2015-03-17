@@ -18,7 +18,7 @@
     <!-- Button Texts -->
     <string name="refresh">Refresh</string>
     <string name="button_spots_taken">See Spots</string>
-    <string name="button_pay_text">Pay</string>
+    <string name="button_pay_text">MAKE PAYMENT</string>
     <string name="title_activity_pay">PayActivity</string>
     <string name="title_activity_select_spot">SelectSpotActivity</string>
 

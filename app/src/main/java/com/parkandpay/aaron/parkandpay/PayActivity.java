@@ -34,7 +34,7 @@ public class PayActivity extends ActionBarActivity {
     private String spotNum;
     private String lotName;
     private static ParseObject selectedLotObj;
-    private static Button resetSpotButton;
+    private static TextView resetSpotButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +45,7 @@ public class PayActivity extends ActionBarActivity {
         spotNum = intent.getStringExtra("spot_num");
         String selectedLot = intent.getStringExtra("lot_name");
         lotName = selectedLot;
-        resetSpotButton = (Button) findViewById(R.id.resetSpotButton);
+        resetSpotButton = (TextView) findViewById(R.id.resetSpotButton);
 
         if(ApplicationConfig.hasSpot()) {
 
@@ -58,14 +58,13 @@ public class PayActivity extends ActionBarActivity {
                 public void done(List<ParseObject> parseObjects, ParseException e) {
                     if(e == null && parseObjects.size() > 0) {
                         selectedLotObj = parseObjects.get(0);
-                        String expiration_time = selectedLotObj.get("PaidForUntil").toString();
+                        Date expiration_time = (Date) selectedLotObj.get("PaidForUntil");
 
-                        //SimpleDateFormat format = new SimpleDateFormat("MMM dd, hh:mm a");
-                        String time = "Expires at: " + expiration_time;
+                        SimpleDateFormat format = new SimpleDateFormat("hh:mm a");
+                        String time = format.format(expiration_time);
 
                         final TextView time_remaining_text = (TextView) findViewById(R.id.time_remaining_text);
                         time_remaining_text.setText(time);
-                        time_remaining_text.setTextSize(32);
                     } else {
                         System.out.println(e.getMessage());
                         throw new RuntimeException();
@@ -76,6 +75,11 @@ public class PayActivity extends ActionBarActivity {
 
         } else {
             resetSpotButton.setVisibility(View.INVISIBLE);
+            selectedTime = Calendar.getInstance().getTime();
+            SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
+            String time = timeFormat.format(selectedTime);
+            final TextView time_remaining_text = (TextView) findViewById(R.id.time_remaining_text);
+            time_remaining_text.setText(time);
         }
 
         Log.d("debug", spotNum);
@@ -88,15 +92,14 @@ public class PayActivity extends ActionBarActivity {
         // ADD SOME TEXT THATS LIKE, THIS SPOT IS CURRENTLY EXPIRED OR
         //      THIS SPOT WILL EXPIRE AT "time"
 
-        //TODO: add today's date here!
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd");
-//        String date = dateFormat.format(selectedTime);
-//        final TextView date_text = (TextView) findViewById(R.id.date_text);
-//        date_text.setText(date);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd");
+        Calendar c = Calendar.getInstance();
+        String date = dateFormat.format(c.getTime());
+        final TextView date_text = (TextView) findViewById(R.id.date_text);
+        date_text.setText(date);
 
         final TextView textview = (TextView) findViewById(R.id.spot_num_text);
-        textview.setText(selectedLot + " Space #"+ spot_text);
-        textview.setTextSize(30);
+        textview.setText(selectedLot + " Parking Space #"+ spot_text);
 
 
 
@@ -191,7 +194,7 @@ public class PayActivity extends ActionBarActivity {
 
 
                         Log.d("test", selectedTime.toString());
-                        SimpleDateFormat format = new SimpleDateFormat("MMM dd, hh:mm a");
+                        SimpleDateFormat format = new SimpleDateFormat("MMMM dd, hh:mm a");
                         // Probably want a confirmation here
                         ParseObject dataObject = ParseObject.createWithoutData("ParkingSpot", selectedLotObj.getObjectId());
 
@@ -204,16 +207,17 @@ public class PayActivity extends ActionBarActivity {
                                     Context context = getApplicationContext();
 
                                     //make pretty time
-                                    SimpleDateFormat format = new SimpleDateFormat("MMM dd, hh:mm a");
-                                    String time = "Expires at: " + format.format(selectedTime);
+                                    SimpleDateFormat dateTimeFormat = new SimpleDateFormat("MMMM dd, hh:mm a");
+                                    String dateTime = "Expires at: " + dateTimeFormat.format(selectedTime);
 
                                     int duration = Toast.LENGTH_LONG;
-                                    Toast toast = Toast.makeText(context, "Payment Successful!\n"+time, duration);
+                                    Toast toast = Toast.makeText(context, "Payment Successful!\n"+dateTime, duration);
                                     toast.show();
 
+                                    SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
+                                    String time = timeFormat.format(selectedTime);
                                     final TextView time_remaining_text = (TextView) findViewById(R.id.time_remaining_text);
                                     time_remaining_text.setText(time);
-                                    time_remaining_text.setTextSize(32);
 
                                     resetSpotButton.setVisibility(View.VISIBLE);
 

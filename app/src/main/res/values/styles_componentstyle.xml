@@ -16,7 +16,7 @@
 	  <item name="android:background">@drawable/componentstyle_btn_default_holo_dark</item>
 	  <item name="android:minHeight">48dip</item>
 	  <item name="android:minWidth">64dip</item>
-	  <item name="android:textColor">@color/law_quad_stone</item>
+	  <item name="android:textColor">@color/expanded_dark_gray</item>
   </style>
 
   <style name="ImageButtonComponentStyle" parent="android:Widget.ImageButton">

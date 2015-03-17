@@ -2,9 +2,9 @@
     <style name="AppTheme" parent="@style/Theme.AppCompat">
         <item name="android:textColor">@color/michigan_maize</item>
         <item name="android:typeface">monospace</item>
-        <item name="android:background">@color/law_quad_stone</item>
+        <!--<item name="android:background">@color/law_quad_stone</item>-->
         <item name="android:actionBarStyle">@style/action_bar_style</item>
-        <item name="android:button">@style/button_style</item>
+        <!--<item name="android:button">@style/button_style</item>-->
         <!--<item name="android:spinnerDropDownItemStyle">@style/mySpinnerItemStyle</item>-->
         <!--<item name="android:spinnerStyle">@style/allSpinnerStyle</item>-->
         <!--<item name="android:spinnersShown">@style/allSpinnerShown</item>-->
@@ -16,10 +16,10 @@
         <item name="android:text">@string/app_name</item>
     </style>
 
-    <style name="button_style" parent="@style/Widget.AppCompat.ActionButton">
-        <item name="android:background">@color/michigan_maize</item>
-        <item name="android:textColor">@color/michigan_maize</item>
-    </style>
+    <!--<style name="button_style" parent="@style/Widget.AppCompat.ActionButton">-->
+        <!--<item name="android:background">@color/michigan_maize</item>-->
+        <!--<item name="android:textColor">@color/michigan_maize</item>-->
+    <!--</style>-->
 
     <style name="mySpinnerItemStyle" parent="Widget.AppCompat.DropDownItem.Spinner">
         <item name="android:textColor">@color/michigan_maize</item>
