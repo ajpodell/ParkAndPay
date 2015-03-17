@@ -18,11 +18,22 @@
         android:textSize="24sp" />
 
     <TextView
-        android:text="@string/hello_world"
+    android:text="@string/hello_world"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/date_text"
+    android:layout_below="@+id/spot_num_text"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentStart="true"
+    android:textSize="18sp"
+    android:textColor="@color/observatory_white" />
+
+    <TextView
+        android:text="Time expires at: 00:00 AM"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/date_text"
-        android:layout_below="@+id/spot_num_text"
+        android:id="@+id/expiration_time"
+        android:layout_below="@+id/date_text"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:textSize="18sp"
@@ -35,12 +46,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/time_remaining_text"
-        android:layout_above="@+id/availSpotsListView"
-        android:layout_marginBottom="25dp"
+        android:layout_marginTop="75dp"
+        android:layout_below="@+id/date_text"
+        android:layout_marginBottom="10dp"
         android:textSize="50sp"
-        android:layout_alignParentTop="false"
-        android:gravity="center_vertical|center|center_horizontal"
+        android:gravity="center_horizontal"
         android:background="@drawable/time_border" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Payment is not complete"
+        android:id="@+id/incompletePayment"
+        android:layout_below="@+id/time_remaining_text"
+        android:layout_centerHorizontal="true"
+        android:textSize="24sp"
+        android:textColor="@color/observatory_white"/>
 
     <Button
         android:layout_width="match_parent"
@@ -49,10 +70,10 @@
         android:id="@+id/availSpotsListView"
         android:onClick="onClickPay"
         android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
+        android:layout_marginTop="10dp"
         android:textSize="28sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:layout_below="@+id/incompletePayment"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -64,7 +85,7 @@
         android:textColor="@color/observatory_white"
         android:layout_below="@+id/availSpotsListView"
         android:paddingTop="25dp"
-        android:textSize="24sp"
+        android:textSize="28sp"
         android:textIsSelectable="true" />
 
     <TextView
@@ -74,7 +95,7 @@
         android:id="@+id/cost"
         android:layout_below="@+id/resetSpotButton"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="30dp"
         android:textSize="50sp"/>
 
 </RelativeLayout>

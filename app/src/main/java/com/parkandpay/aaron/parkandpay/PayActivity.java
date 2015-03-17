@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -32,9 +33,12 @@ public class PayActivity extends ActionBarActivity {
     private String spotNum;
     private String lotName;
     private static ParseObject selectedLotObj;
+    private static Button paymentButton;
     private static TextView resetSpotButton;
     private static TextView costView;
     private static TextView selectTimeButton;
+    private static TextView incompletePayment;
+    private static TextView expirationTime;
     private static double cost_value;
 
     @Override
@@ -49,7 +53,11 @@ public class PayActivity extends ActionBarActivity {
         resetSpotButton = (TextView) findViewById(R.id.resetSpotButton);
         costView = (TextView) findViewById(R.id.cost);
         selectTimeButton = (TextView) findViewById(R.id.time_remaining_text);
+        incompletePayment = (TextView) findViewById(R.id.incompletePayment);
+        expirationTime = (TextView) findViewById(R.id.expiration_time);
+        paymentButton = (Button) findViewById(R.id.availSpotsListView);
 
+        incompletePayment.setVisibility(View.INVISIBLE);
         // if the user has already paid for a spot, use the information from that to populate text fields
         if(ApplicationConfig.hasSpot()) {
             costView.setVisibility(View.INVISIBLE);
@@ -61,7 +69,11 @@ public class PayActivity extends ActionBarActivity {
                 public void done(List<ParseObject> parseObjects, ParseException e) {
                     if(e == null && parseObjects.size() > 0) {
                         selectedTime = (Date) selectedLotObj.get("PaidForUntil");
+                        expirationTime.setText("Time expires at: " + new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
+                        expirationTime.setVisibility(View.VISIBLE);
                         selectTimeButton.setText(new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
+                        // TODO: gray out payment button when the user hasn't added more time yet
+                        paymentButton.setText("pay for more time");
                     } else {
                         System.out.println(e.getMessage());
                         throw new RuntimeException();
@@ -72,10 +84,11 @@ public class PayActivity extends ActionBarActivity {
         // if the user has not paid for a spot, populate text fields with default information
         } else {
             costView.setVisibility(View.VISIBLE);
+            expirationTime.setVisibility(View.INVISIBLE);
             costView.setText("$0.00");
             cost_value = 0;
             resetSpotButton.setVisibility(View.INVISIBLE);
-            selectedTime = Calendar.getInstance().getTime();
+            selectedTime = Calendar.getInstance().getTime(); // important because use in later function calls
             selectTimeButton.setText(new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
         }
 
@@ -128,14 +141,14 @@ public class PayActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    // TODO: add different functionality to allow a user to add time to an already purchased space don't charge them more for it.
     public void onClickAddTime(View view) {
         Log.d("test", "add time button clicked");
 
-        // Creates Calendar dialog
-        final Calendar c = Calendar.getInstance();
-        Integer curHour = c.get(Calendar.HOUR_OF_DAY);
-        Integer curMinute = c.get(Calendar.MINUTE);
+        Integer currentHour;
+        Integer currentMinute;
+        // Creates Time Picker dialog
+        currentHour = selectedTime.getHours();
+        currentMinute = selectedTime.getMinutes();
         TimePickerDialog tpd = new TimePickerDialog(this,
             new TimePickerDialog.OnTimeSetListener() {
 
@@ -152,6 +165,7 @@ public class PayActivity extends ActionBarActivity {
                     selectTimeButton.setText(new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
 
                     // calculates cost based on the difference of the selected time and the current time.
+                    // TODO: change to allow adding time without extra charge... should compare to current time OR time already paid for
                     cost_value = 0.70*Math.ceil(((double) ((selectedTime.getTime() - Calendar.getInstance().getTimeInMillis())/(1000 * 60))) / 30);
                     if(cost_value < 0) {
                         cost_value = 0;
@@ -159,8 +173,9 @@ public class PayActivity extends ActionBarActivity {
                     costView.setText("$" + String.format("%.2f", cost_value));
                 }
 
-            }, curHour, curMinute, false);
+            }, currentHour, currentMinute, false);
         tpd.show();
+        incompletePayment.setVisibility(View.VISIBLE);
     }
 
     public void onClickPay(View view) {
@@ -190,6 +205,11 @@ public class PayActivity extends ActionBarActivity {
                                 Log.d("test", "parse object saved");
 
                                 resetSpotButton.setVisibility(View.VISIBLE);
+                                incompletePayment.setVisibility(View.INVISIBLE);
+                                expirationTime.setText("Time expires at: " + new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
+                                expirationTime.setVisibility(View.VISIBLE);
+                                // TODO: gray out button when the user hasn't added more time yet
+                                paymentButton.setText("pay for more time");
 
 //                                Context context = getApplicationContext();
 //
