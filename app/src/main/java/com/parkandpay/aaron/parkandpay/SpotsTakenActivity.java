@@ -9,13 +9,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.content.Intent;
 
 
 import com.parse.FindCallback;
-import com.parse.Parse;
+import com.parse.ParseObject;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -67,12 +69,20 @@ public class SpotsTakenActivity extends ActionBarActivity {
         selectedLot = object;
     }
 
-    public void refresh(View view) {
-        Spinner spinner = (Spinner) findViewById(R.id.lot_spinner);
-        getLotObjectFromName(spinner.getSelectedItem().toString());
-        getDataFromParse(selectedLot);
-        addStatusToBundle();
-        showAvailable();
+
+    public void addStatusToBundle() {
+        Calendar paid_for_time = Calendar.getInstance();
+        Calendar now = Calendar.getInstance();
+        for (Integer i = 0; i < spot_bundle.size(); i++){
+            paid_for_time = ((Calendar) ((Bundle) spot_bundle.get(i.toString())).get("time"));
+            now = Calendar.getInstance();
+            if (paid_for_time.after(now)) {
+                ((Bundle) spot_bundle.get(i.toString())).putBoolean("gets_ticket", false);
+            }
+            else {
+                ((Bundle) spot_bundle.get(i.toString())).putBoolean("gets_ticket", true);
+            }
+        }
     }
 
 
@@ -85,25 +95,6 @@ public class SpotsTakenActivity extends ActionBarActivity {
         adapter.notifyDataSetChanged();
         ListView listView = (ListView) findViewById(R.id.lots_list);
         listView.setAdapter(adapter);
-    }
-
-
-    public void addStatusToBundle() {
-        Calendar paid_for_time = Calendar.getInstance();
-        Calendar now = Calendar.getInstance();
-        for (Integer i = 0; i < spot_bundle.size(); i++){
-            paid_for_time = ((Calendar) ((Bundle) spot_bundle.get(i.toString())).get("time"));
-            now = Calendar.getInstance();
-//            now.set(Calendar.HOUR, 10);
-//            now.set(Calendar.MINUTE, 0);
-//            now.set(Calendar.AM_PM, 0);
-            if (paid_for_time.after(now)) {
-                ((Bundle) spot_bundle.get(i.toString())).putBoolean("gets_ticket", false);
-            }
-            else {
-                ((Bundle) spot_bundle.get(i.toString())).putBoolean("gets_ticket", true);
-            }
-        }
     }
 
     public void getLotObjectFromName(String lot) {
@@ -125,6 +116,7 @@ public class SpotsTakenActivity extends ActionBarActivity {
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> parseObjects, ParseException e) {
                 if (e == null) {
+                    spot_bundle = new Bundle();
                     Integer count = -1;
                     for (ParseObject object : parseObjects) {
                         Date spot_date = object.getDate("PaidForUntil");
@@ -145,41 +137,12 @@ public class SpotsTakenActivity extends ActionBarActivity {
         });
     }
 
-    /*
-    public void populateSpinner() {
+    public void refresh(View view) {
         Spinner spinner = (Spinner) findViewById(R.id.lot_spinner);
-        final List<ParseObject> lotObjects = new ArrayList<ParseObject>();
-        // Parse query to get the lot names
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingLot");
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> parseObjects, ParseException e) {
-                if (e == null) {
-                    for (ParseObject object : parseObjects) {
-                        lotObjects.add(object);
-                    }
-                }
-            }
-        });
-        String[] values = {"Lot_1" , "Lot_2"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, values);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-*/
-
-/*     custom spinner with objects stored
-        final CustomSpinner adapter = new CustomSpinner(this, android.R.layout.simple_spinner_dropdown_item, lotObjects);
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                SpotsTakenActivity.selectedLot = adapter.getItem(position);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) { }
-        });
-*/
-   // }
+        getLotObjectFromName(spinner.getSelectedItem().toString());
+        getDataFromParse(selectedLot);
+        addStatusToBundle();
+        showAvailable();
+    }
 
 }

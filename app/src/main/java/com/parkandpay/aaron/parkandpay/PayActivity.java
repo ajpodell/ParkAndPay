@@ -1,6 +1,7 @@
 package com.parkandpay.aaron.parkandpay;
 
 import android.app.AlertDialog;
+import android.app.Application;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -68,6 +69,7 @@ public class PayActivity extends ActionBarActivity {
             query.findInBackground(new FindCallback<ParseObject>() {
                 public void done(List<ParseObject> parseObjects, ParseException e) {
                     if(e == null && parseObjects.size() > 0) {
+                        ApplicationConfig.setPaidAt((Date)selectedLotObj.get("PaidForAt"));
                         selectedTime = (Date) selectedLotObj.get("PaidForUntil");
                         expirationTime.setText("Time expires at: " + new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
                         expirationTime.setVisibility(View.VISIBLE);
@@ -102,8 +104,8 @@ public class PayActivity extends ActionBarActivity {
         ((TextView) findViewById(R.id.date_text)).setText(new SimpleDateFormat("MMMM dd", Locale.US).format(Calendar.getInstance().getTime()));
         ((TextView) findViewById(R.id.spot_num_text)).setText(lotName + " Parking Space #" + spot_text);
 
-        //janky get lot id - currently always lot 1
-        // TODO: Someone add comments to explain what's going on here!
+        // Gets the Spot which the Spot Number and Lot Name chosen from the previous Activity
+        // TODO - does this override if User currently has a spot?
         ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot");
         query.whereEqualTo("Lot_Name", lotName);
         query.whereEqualTo("SpotName", spotNum);
@@ -167,10 +169,14 @@ public class PayActivity extends ActionBarActivity {
                     // calculates cost based on the difference of the selected time and the current time.
                     // TODO: change to allow adding time without extra charge... should compare to current time OR time already paid for
                     cost_value = 0.70*Math.ceil(((double) ((selectedTime.getTime() - Calendar.getInstance().getTimeInMillis())/(1000 * 60))) / 30);
-                    if(cost_value < 0) {
+                    if(cost_value <= 0) {
+                        costView.setText("Please select a valid time");
+                        costView.setTextSize(24);
                         cost_value = 0;
+                    } else {
+                        costView.setText("$" + String.format("%.2f", cost_value));
                     }
-                    costView.setText("$" + String.format("%.2f", cost_value));
+
                 }
 
             }, currentHour, currentMinute, false);
@@ -180,6 +186,13 @@ public class PayActivity extends ActionBarActivity {
 
     public void onClickPay(View view) {
         Log.d("test", "pay button clicked");
+
+        if(cost_value == 0) {
+            int duration = Toast.LENGTH_LONG;
+            Toast toast = Toast.makeText(PayActivity.this, "Please enter a time after now", duration);
+            toast.show();
+            return;
+        }
 
         // Fields for the confirmation dialog
         AlertDialog.Builder confirmationDialog = new AlertDialog.Builder(this);
@@ -198,6 +211,11 @@ public class PayActivity extends ActionBarActivity {
                     ParseObject dataObject = ParseObject.createWithoutData("ParkingSpot", selectedLotObj.getObjectId());
 
                     dataObject.put("PaidForUntil", selectedTime);
+                    if(ApplicationConfig.hasPaidAt()) {
+                        dataObject.put("PaidForAt", ApplicationConfig.getPaidAt());
+                    } else {
+                        dataObject.put("PaidForAt", new Date());
+                    }
                     dataObject.saveInBackground(new SaveCallback() {
                         public void done(ParseException e) {
                             if (e == null) {
@@ -209,15 +227,13 @@ public class PayActivity extends ActionBarActivity {
                                 expirationTime.setText("Time expires at: " + new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
                                 expirationTime.setVisibility(View.VISIBLE);
                                 // TODO: gray out button when the user hasn't added more time yet
-                                paymentButton.setText("pay for more time");
+                                paymentButton.setText("change expiration time");
 
-//                                Context context = getApplicationContext();
-//
-//                                int duration = Toast.LENGTH_LONG;
-//                                Toast toast = Toast.makeText(context, "Payment Successful!\n" +
-//                                        "Expires at: " + new SimpleDateFormat("MMMM dd, hh:mm a",
-//                                        Locale.US).format(selectedTime), duration);
-//                                toast.show();
+                                int duration = Toast.LENGTH_LONG;
+                                Toast toast = Toast.makeText(PayActivity.this, "Reservation Successful!\n" +
+                                        "Expires at: " + new SimpleDateFormat("MMMM dd, hh:mm a",
+                                        Locale.US).format(selectedTime), duration);
+                                toast.show();
 
 
                                 ApplicationConfig.setSpotTaken(spotNum);
@@ -264,6 +280,14 @@ public class PayActivity extends ActionBarActivity {
                         public void done(ParseException e) {
                             if (e == null) {
                                 ApplicationConfig.resetSpot();
+                                int duration = Toast.LENGTH_LONG;
+                                // TODO - charge User this amount
+                                double finalCharge =
+                                        0.70*Math.ceil(((double) ((Calendar.getInstance().getTimeInMillis() -
+                                                ApplicationConfig.getPaidAt().getTime())/(1000 * 60))) / 30);
+                                Toast toast = Toast.makeText(PayActivity.this, "Cancelation Successful!\n" +
+                                        "Total Payment: " + finalCharge, duration);
+                                toast.show();
                                 startActivity(new Intent(PayActivity.this, MainActivity.class));
                             } else {
                                 throw new RuntimeException();
