@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Date;
 
+
 import com.parse.ParseQuery;
 import com.parse.ParseObject;
 import com.parse.FindCallback;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 
 
 public class SelectSpotActivity extends ActionBarActivity {
+    Integer NUM_VALUES = 40;
 
     private static String first_lot_name_c = "l8W9nV5ami";
 
@@ -78,37 +80,32 @@ public class SelectSpotActivity extends ActionBarActivity {
                         @Override
                         public void onItemClick(AdapterView<?> parent, final View view,
                                                 int position, long id) {
-                            final String item = parent.getItemAtPosition(position).toString();
-                            Log.d("debug", item);
+                            final Integer item = (Integer) parent.getItemAtPosition(position); // need to resolve string vs Integer
+                            Log.d("debug", item.toString());
 
                             Intent intent = new Intent(view.getContext(), PayActivity.class);
                             intent.putExtra("spot_num", item);
                             intent.putExtra("lot_name", lot_name);
-
                             startActivity(intent);
-
-                /*
-                view.animate().setDuration(2000).alpha(0)
-                        .withEndAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                list.remove(item);
-                                adapter.notifyDataSetChanged();
-                                view.setAlpha(1);
-                            }
-                        });
-                       */
+            
+                                
+                            /*
+                            view.animate().setDuration(2000).alpha(0)
+                                    .withEndAction(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            list.remove(item);
+                                            adapter.notifyDataSetChanged();
+                                            view.setAlpha(1);
+                                        }
+                                    });
+                                   */
                         }
-
                     });
-                } else {
-                    // throw new RuntimeException();
                 }
             }
         });
     }
-
-
 
 
     //-----------------BUILT IN--------------------------//
