@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="ComponentStyle" parent="Theme.AppCompat">
+
+    <item name="android:editTextStyle">@style/EditTextComponentStyle</item>
+
+    <item name="android:textColorHighlight">#99ffcb05</item>
+
+    <item name="android:checkboxStyle">@style/CheckBoxComponentStyle</item>
+
+    <item name="android:buttonStyle">@style/ButtonComponentStyle</item>
+
+    <item name="android:imageButtonStyle">@style/ImageButtonComponentStyle</item>
+
+    <item name="android:spinnerStyle">@style/SpinnerComponentStyle</item>
+
+    <item name="android:spinnerDropDownItemStyle">@style/SpinnerDropDownItemComponentStyle</item>
+
+    <item name="android:buttonStyleToggle">@style/ToggleComponentStyle</item>
+
+    <item name="android:listViewStyle">@style/ListViewComponentStyle</item>
+
+    <item name="android:listViewWhiteStyle">@style/ListViewComponentStyle.White</item>
+
+    <item name="android:spinnerItemStyle">@style/SpinnerItemComponentStyle</item>
+
+  </style>
+
+</resources>
