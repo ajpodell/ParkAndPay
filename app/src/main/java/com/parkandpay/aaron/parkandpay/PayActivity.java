@@ -297,6 +297,7 @@ public class PayActivity extends ActionBarActivity {
 
                 }
             });
+        //
 
         // if no is selected, not update parse information
         resetDialog.setNegativeButton("No",
