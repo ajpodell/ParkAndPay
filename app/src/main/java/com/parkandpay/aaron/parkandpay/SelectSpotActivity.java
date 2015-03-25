@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Date;
 
-
 import com.parse.ParseQuery;
 import com.parse.ParseObject;
 import com.parse.FindCallback;
@@ -65,10 +64,12 @@ public class SelectSpotActivity extends ActionBarActivity {
             public void done(List<ParseObject> objects, ParseException e) {
                 if (e == null) {
                     for (int i = 0; i < objects.size(); ++i) {
-                        list.add(objects.get(i).getString("SpotName"));
+                        String numStr = objects.get(i).getString("SpotName");
+                        if(Integer.parseInt(numStr) < 10) numStr = "0" + numStr;
+                        list.add(numStr);
                     }
                     // Sort spot numbers
-                    Collections.sort(list);
+                    Collections.sort(list);  // should do a custom comparator
 
                     final ArrayAdapter adapter = new ArrayAdapter(SelectSpotActivity.this,
                             android.R.layout.simple_list_item_1, list);
@@ -80,8 +81,10 @@ public class SelectSpotActivity extends ActionBarActivity {
                         @Override
                         public void onItemClick(AdapterView<?> parent, final View view,
                                                 int position, long id) {
-                            final Integer item = (Integer) parent.getItemAtPosition(position); // need to resolve string vs Integer
-                            Log.d("debug", item.toString());
+                            String item = parent.getItemAtPosition(position).toString(); // need to resolve string vs Integer
+                            Integer i = Integer.parseInt(item);
+                            item = i.toString();
+                            Log.d("debug", item);
 
                             Intent intent = new Intent(view.getContext(), PayActivity.class);
                             intent.putExtra("spot_num", item);

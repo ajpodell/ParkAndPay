@@ -126,6 +126,8 @@ public class SpotsTakenActivity extends ActionBarActivity {
                         spot.putSerializable("time", spottime);
                         spot.putString("name", object.getString("SpotName"));
                         count += 1;
+                        //String numStr = count.toString();
+                        //( count < 10) numStr = "0" + numStr;
                         spot_bundle.putBundle(count.toString(), spot);
                     }
                 }
