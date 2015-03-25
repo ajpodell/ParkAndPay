@@ -3,6 +3,7 @@ package com.parkandpay.aaron.parkandpay;
 
 import android.app.Application;
 import com.parse.Parse;
+import java.util.Date;
 
 /**
  * Created by joshmerle on 3/10/15.
@@ -11,6 +12,7 @@ public class ApplicationConfig extends Application {
 
     private static String spotTaken = "";
     private static String lotName = "";
+    private static Date paidAt = null;
 
     @Override
     public void onCreate() {
@@ -45,6 +47,30 @@ public class ApplicationConfig extends Application {
 
     public static void setLotName(String lot_name) {
         lotName = lot_name;
+    }
+
+    public static boolean hasPaidAt() {
+        return paidAt != null;
+    }
+
+    public static void setPaidAt(Date d) {
+        paidAt = d;
+    }
+
+    public static void resetPaidAt() {
+        paidAt = null;
+    }
+
+    public static Date getPaidAt() {
+        return paidAt;
+    }
+
+    public static void updateSpotData(Date expirationTime) {
+        Date now = new Date();
+        if(expirationTime.after(now)) {
+            paidAt = null;
+            resetSpot();
+        }
     }
 
 }
