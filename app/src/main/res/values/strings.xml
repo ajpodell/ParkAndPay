@@ -26,5 +26,8 @@
     <string name="PARSE_APPLICATION_ID">D3e1FmZef0xReoXZlWFVGgxIosiuUfusQ9jgHT7y</string>
     <string name="PARSE_CLIENT_KEY">FFUhtwW99qsT4ExUj2kepUhKVAibc3MsMJYJGf2x</string>
 
+    <!-- use database names -->
+    <string name="SpotNumberInDb">spot_num</string>
+
 
 </resources>

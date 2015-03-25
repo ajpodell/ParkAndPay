@@ -26,6 +26,7 @@ import java.util.ArrayList;
 
 
 public class SelectSpotActivity extends ActionBarActivity {
+    Integer NUM_VALUES = 40;
 
     private static String first_lot_name_c = "l8W9nV5ami";
 
@@ -63,10 +64,12 @@ public class SelectSpotActivity extends ActionBarActivity {
             public void done(List<ParseObject> objects, ParseException e) {
                 if (e == null) {
                     for (int i = 0; i < objects.size(); ++i) {
-                        list.add(objects.get(i).getString("SpotName"));
+                        String numStr = objects.get(i).getString("SpotName");
+                        if(Integer.parseInt(numStr) < 10) numStr = "0" + numStr;
+                        list.add(numStr);
                     }
                     // Sort spot numbers
-                    Collections.sort(list);
+                    Collections.sort(list);  // should do a custom comparator
 
                     final ArrayAdapter adapter = new ArrayAdapter(SelectSpotActivity.this,
                             android.R.layout.simple_list_item_1, list);
@@ -78,37 +81,34 @@ public class SelectSpotActivity extends ActionBarActivity {
                         @Override
                         public void onItemClick(AdapterView<?> parent, final View view,
                                                 int position, long id) {
-                            final String item = parent.getItemAtPosition(position).toString();
+                            String item = parent.getItemAtPosition(position).toString(); // need to resolve string vs Integer
+                            Integer i = Integer.parseInt(item);
+                            item = i.toString();
                             Log.d("debug", item);
 
                             Intent intent = new Intent(view.getContext(), PayActivity.class);
                             intent.putExtra("spot_num", item);
                             intent.putExtra("lot_name", lot_name);
-
                             startActivity(intent);
-
-                /*
-                view.animate().setDuration(2000).alpha(0)
-                        .withEndAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                list.remove(item);
-                                adapter.notifyDataSetChanged();
-                                view.setAlpha(1);
-                            }
-                        });
-                       */
+            
+                                
+                            /*
+                            view.animate().setDuration(2000).alpha(0)
+                                    .withEndAction(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            list.remove(item);
+                                            adapter.notifyDataSetChanged();
+                                            view.setAlpha(1);
+                                        }
+                                    });
+                                   */
                         }
-
                     });
-                } else {
-                    // throw new RuntimeException();
                 }
             }
         });
     }
-
-
 
 
     //-----------------BUILT IN--------------------------//
