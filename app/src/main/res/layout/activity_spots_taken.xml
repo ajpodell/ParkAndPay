@@ -12,23 +12,23 @@
         android:id="@+id/lots_list"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="41dp"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/lot_spinner" />
 
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/refresh_icon"
+        android:src="@drawable/ic_go_arrow"
         android:background="@color/expanded_dark_gray"
         android:id="@+id/button_refresh"
         android:adjustViewBounds="true"
         android:maxWidth="60dp"
         android:maxHeight="60dp"
         android:scaleType="fitXY"
+        android:onClick="refresh"
         android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:onClick="refresh" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <Spinner
         android:id="@+id/lot_spinner"
@@ -36,8 +36,10 @@
         android:textColor="#ff9cccf2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/button_refresh"
-        android:layout_toEndOf="@+id/button_refresh" />
+        android:layout_alignTop="@+id/button_refresh"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/button_refresh"
+        android:layout_toStartOf="@+id/button_refresh" />
 
 </RelativeLayout>
