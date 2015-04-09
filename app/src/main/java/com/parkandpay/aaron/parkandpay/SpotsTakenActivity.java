@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.content.Intent;
 
@@ -29,12 +30,14 @@ public class SpotsTakenActivity extends ActionBarActivity {
 
     private static Bundle spot_bundle = new Bundle();
     private static ParseObject selectedLot;
+    private static ListView spotsList;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spots_taken);
+        spotsList = (ListView) findViewById(R.id.lots_list);
     }
 
     @Override
@@ -92,9 +95,7 @@ public class SpotsTakenActivity extends ActionBarActivity {
             values.add(i, "");
         }
         SpotsList adapter = new SpotsList(this.getApplicationContext(), spot_bundle, values);
-        adapter.notifyDataSetChanged();
-        ListView listView = (ListView) findViewById(R.id.lots_list);
-        listView.setAdapter(adapter);
+        spotsList.setAdapter(adapter);
     }
 
     public void getLotObjectFromName(String lot) {
@@ -112,7 +113,7 @@ public class SpotsTakenActivity extends ActionBarActivity {
         // parse query to get spot time info
         ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot");
         query.whereEqualTo("Lot", lot);
-        query.addAscendingOrder("SpotName");
+        query.addAscendingOrder("SpotNumber");
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> parseObjects, ParseException e) {
                 if (e == null) {
@@ -124,7 +125,7 @@ public class SpotsTakenActivity extends ActionBarActivity {
                         Calendar spottime = Calendar.getInstance();
                         spottime.setTime(spot_date);
                         spot.putSerializable("time", spottime);
-                        spot.putString("name", object.getString("SpotName"));
+                        spot.putInt("number", object.getInt("SpotNumber"));
                         count += 1;
                         //String numStr = count.toString();
                         //( count < 10) numStr = "0" + numStr;

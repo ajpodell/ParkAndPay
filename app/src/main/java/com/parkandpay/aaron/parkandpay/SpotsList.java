@@ -46,12 +46,14 @@ public class SpotsList extends ArrayAdapter<String> {
 
         if (temp_spot.getBoolean("gets_ticket")) {
             imageView.setImageResource(R.drawable.x_icon);
-            textView.setText(temp_spot.getString("name") + " is unpaid for!");
+            Integer num = temp_spot.getInt("number");
+            textView.setText(num.toString() + " is unpaid for!");
             textView.setTextColor(Color.RED);
         }
         else {
             imageView.setImageResource(R.drawable.check_icon);
-            textView.setText(temp_spot.getString("name") + " is paid for until " + str);
+            Integer num = temp_spot.getInt("number");
+            textView.setText(num.toString() + " is paid for until " + str);
             textView.setTextColor(Color.YELLOW);
         }
 
