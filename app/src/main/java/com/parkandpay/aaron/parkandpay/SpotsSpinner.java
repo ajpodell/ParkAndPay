@@ -27,10 +27,12 @@ public class SpotsSpinner extends ArrayAdapter<ParseObject> {
     public int getCount() {
         return data.size();
     }
+
     @Override
     public ParseObject getItem(int position) {
         return data.get(position);
     }
+
     @Override
     public long getItemId(int position) {
         return position;

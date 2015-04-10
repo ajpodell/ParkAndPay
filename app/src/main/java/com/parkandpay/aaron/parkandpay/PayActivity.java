@@ -1,12 +1,12 @@
 package com.parkandpay.aaron.parkandpay;
 
 import android.app.AlertDialog;
-import android.app.Application;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.SpannableString;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,7 +39,7 @@ public class PayActivity extends ActionBarActivity {
     private static TextView costView;
     private static TextView selectTimeButton;
     private static TextView incompletePayment;
-    private static TextView expirationTime;
+//    private static TextView expirationTime;
     private static double cost_value;
 
     @Override
@@ -55,14 +55,14 @@ public class PayActivity extends ActionBarActivity {
         costView = (TextView) findViewById(R.id.cost);
         selectTimeButton = (TextView) findViewById(R.id.time_remaining_text);
         incompletePayment = (TextView) findViewById(R.id.incompletePayment);
-        expirationTime = (TextView) findViewById(R.id.expiration_time);
+//        expirationTime = (TextView) findViewById(R.id.expiration_time);
         paymentButton = (Button) findViewById(R.id.availSpotsListView);
 
         incompletePayment.setVisibility(View.INVISIBLE);
         // if the user has already paid for a spot, use the information from that to populate text fields
         if(ApplicationConfig.hasSpot()) {
-            costView.setVisibility(View.INVISIBLE);
-
+//            costView.setVisibility(View.INVISIBLE);
+            paymentButton.setVisibility(View.VISIBLE);
             ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot");
             query.whereEqualTo("Lot_Name", lotName);
             query.whereEqualTo("SpotName", spotNum);
@@ -71,11 +71,11 @@ public class PayActivity extends ActionBarActivity {
                     if(e == null && parseObjects.size() > 0) {
                         ApplicationConfig.setPaidAt((Date)selectedLotObj.get("PaidForAt"));
                         selectedTime = (Date) selectedLotObj.get("PaidForUntil");
-                        expirationTime.setText("Time expires at: " + new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
-                        expirationTime.setVisibility(View.VISIBLE);
+//                        expirationTime.setText("Time expires at: " + new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
+//                        expirationTime.setVisibility(View.VISIBLE);
                         selectTimeButton.setText(new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
                         // TODO: gray out payment button when the user hasn't added more time yet
-                        paymentButton.setText("pay for more time");
+//                        paymentButton.setText("pay for more time");
                     } else {
                         System.out.println(e.getMessage());
                         throw new RuntimeException();
@@ -86,9 +86,13 @@ public class PayActivity extends ActionBarActivity {
         // if the user has not paid for a spot, populate text fields with default information
         } else {
             costView.setVisibility(View.VISIBLE);
-            expirationTime.setVisibility(View.INVISIBLE);
-            costView.setText("$0.00");
+
+//            expirationTime.setVisibility(View.INVISIBLE);
             cost_value = 0;
+            SpannableString content = new SpannableString("Total: $" + String.format("%.2f", cost_value));
+//            content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+            costView.setText(content);
+            paymentButton.setVisibility(View.VISIBLE);
             resetSpotButton.setVisibility(View.INVISIBLE);
             selectedTime = Calendar.getInstance().getTime(); // important because use in later function calls
             selectTimeButton.setText(new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
@@ -101,8 +105,8 @@ public class PayActivity extends ActionBarActivity {
         }
 
         // set the date and the space number
-        ((TextView) findViewById(R.id.date_text)).setText(new SimpleDateFormat("MMMM dd", Locale.US).format(Calendar.getInstance().getTime()));
-        ((TextView) findViewById(R.id.spot_num_text)).setText(lotName + " Parking Space #" + spot_text);
+//        ((TextView) findViewById(R.id.date_text)).setText(new SimpleDateFormat("MMMM dd", Locale.US).format(Calendar.getInstance().getTime()));
+        ((TextView) findViewById(R.id.spot_num_text)).setText(lotName + " Space #" + spot_text);
 
         // Gets the Spot which the Spot Number and Lot Name chosen from the previous Activity
         // TODO - does this override if User currently has a spot?
@@ -143,6 +147,25 @@ public class PayActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void onClickAdd30Min(View view) {
+        Log.d("test", "add time button clicked");
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(selectedTime);
+        cal.add(Calendar.MINUTE, 30);
+        selectedTime = cal.getTime();
+        selectTimeButton.setText(new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
+
+        cost_value = 0.70*Math.ceil(((double) ((selectedTime.getTime() - Calendar.getInstance().getTimeInMillis())/(1000 * 60))) / 30);
+
+        SpannableString content = new SpannableString("Total: $" + String.format("%.2f", cost_value));
+        costView.setText(content);
+        costView.setTextSize(40);
+        paymentButton.setVisibility(View.VISIBLE);
+
+        incompletePayment.setVisibility(View.VISIBLE);
+    }
+
     public void onClickAddTime(View view) {
         Log.d("test", "add time button clicked");
 
@@ -173,8 +196,14 @@ public class PayActivity extends ActionBarActivity {
                         costView.setText("Please select a valid time");
                         costView.setTextSize(24);
                         cost_value = 0;
+                        paymentButton.setVisibility(View.INVISIBLE);
                     } else {
-                        costView.setText("$" + String.format("%.2f", cost_value));
+                        SpannableString content = new SpannableString("Total: $" + String.format("%.2f", cost_value));
+//                        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+                        costView.setText(content);
+                        costView.setTextSize(40);
+                        paymentButton.setVisibility(View.VISIBLE);
+//                        costView.setText("Total: $" + String.format("%.2f", cost_value));
                     }
 
                 }
@@ -197,11 +226,11 @@ public class PayActivity extends ActionBarActivity {
         // Fields for the confirmation dialog
         AlertDialog.Builder confirmationDialog = new AlertDialog.Builder(this);
         confirmationDialog.setTitle("Payment Details");
-        confirmationDialog.setMessage("lot name: " + lotName +
-                "\nspace: " + spotNum +
-                "\ndate: " + new SimpleDateFormat("MMMM dd", Locale.US).format(selectedTime) +
-                "\nexpiration time: " + new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime) +
-                "\n\ncost: $" + String.format("%.2f", cost_value));
+        confirmationDialog.setMessage("Lot name: " + lotName +
+                "\nSpace: " + spotNum +
+                "\nDate: " + new SimpleDateFormat("MMMM dd", Locale.US).format(selectedTime) +
+                "\nExpiration time: " + new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime) +
+                "\n\nCost: $" + String.format("%.2f", cost_value));
         confirmationDialog.setCancelable(true);
 
         // The confirm button: will send data to parse if payment is confirmed
@@ -224,10 +253,10 @@ public class PayActivity extends ActionBarActivity {
 
                                 resetSpotButton.setVisibility(View.VISIBLE);
                                 incompletePayment.setVisibility(View.INVISIBLE);
-                                expirationTime.setText("Time expires at: " + new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
-                                expirationTime.setVisibility(View.VISIBLE);
+//                                expirationTime.setText("Time expires at: " + new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
+//                                expirationTime.setVisibility(View.VISIBLE);
                                 // TODO: gray out button when the user hasn't added more time yet
-                                paymentButton.setText("change expiration time");
+//                                paymentButton.setText("change expiration time");
 
                                 int duration = Toast.LENGTH_LONG;
                                 Toast toast = Toast.makeText(PayActivity.this, "Reservation Successful!\n" +
