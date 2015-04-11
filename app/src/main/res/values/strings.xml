@@ -9,7 +9,7 @@
 
     <string name="app_name">Park and Pay</string>
     <string name="hello_world">Hello world!</string>
-    <string name="lot_space">Lot name and space number</string>
+    <string name="lot_space">No lot or space selected</string>
     <string name="month_day">Month Day</string>
     <string name="action_settings">Settings</string>
     <string name="total">Total: </string>

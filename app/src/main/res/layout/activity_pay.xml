@@ -80,6 +80,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text=" + Change lot or space"
+        android:onClick="onClickChangeLotSpace"
         android:id="@+id/change_lot_space"
         android:textColor="@color/observatory_white"
         android:paddingTop="15dp"

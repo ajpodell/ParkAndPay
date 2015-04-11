@@ -48,9 +48,11 @@ public class PayActivity extends ActionBarActivity {
         setContentView(R.layout.activity_pay);
 
         // initialize all clickable buttons and text views that are used in multiple functions
-        Intent intent = getIntent();
-        spotNum = intent.getStringExtra("spot_num");
-        lotName = intent.getStringExtra("lot_name");
+        Bundle bundle = getIntent().getExtras();
+        if(bundle != null && bundle.containsKey("spot_num")) {
+            spotNum = bundle.getString("spot_num");
+            lotName = bundle.getString("lot_name");
+        }
         resetSpotButton = (TextView) findViewById(R.id.resetSpotButton);
         costView = (TextView) findViewById(R.id.cost);
         selectTimeButton = (TextView) findViewById(R.id.time_remaining_text);
@@ -98,31 +100,30 @@ public class PayActivity extends ActionBarActivity {
             selectTimeButton.setText(new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
         }
 
-        Log.d("debug", spotNum);
-        String spot_text = "Sorry, could not find your spot. Please try again.";
         if(spotNum != null) {
-            spot_text = spotNum;
-        }
+            Log.d("debug", spotNum);
+            String spot_text = spotNum;
 
-        // set the date and the space number
+            // set the date and the space number
 //        ((TextView) findViewById(R.id.date_text)).setText(new SimpleDateFormat("MMMM dd", Locale.US).format(Calendar.getInstance().getTime()));
-        ((TextView) findViewById(R.id.spot_num_text)).setText(lotName + " Space #" + spot_text);
+            ((TextView) findViewById(R.id.spot_num_text)).setText(lotName + " Space #" + spot_text);
 
-        // Gets the Spot which the Spot Number and Lot Name chosen from the previous Activity
-        // TODO - does this override if User currently has a spot?
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot");
-        query.whereEqualTo("Lot_Name", lotName);
-        query.whereEqualTo("SpotName", spotNum);
-        query.findInBackground(new FindCallback<ParseObject>() {
-            public void done(List<ParseObject> parseObjects, ParseException e) {
-                if(e == null && parseObjects.size() > 0) {
-                    selectedLotObj = parseObjects.get(0);
-                } else {
-                    System.out.println(e.getMessage());
-                    throw new RuntimeException();
+            // Gets the Spot which the Spot Number and Lot Name chosen from the previous Activity
+            // TODO - does this override if User currently has a spot?
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot");
+            query.whereEqualTo("Lot_Name", lotName);
+            query.whereEqualTo("SpotName", spotNum);
+            query.findInBackground(new FindCallback<ParseObject>() {
+                public void done(List<ParseObject> parseObjects, ParseException e) {
+                    if (e == null && parseObjects.size() > 0) {
+                        selectedLotObj = parseObjects.get(0);
+                    } else {
+                        System.out.println(e.getMessage());
+                        throw new RuntimeException();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override
@@ -155,15 +156,21 @@ public class PayActivity extends ActionBarActivity {
         cal.add(Calendar.MINUTE, 30);
         selectedTime = cal.getTime();
         selectTimeButton.setText(new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
-
         cost_value = 0.70*Math.ceil(((double) ((selectedTime.getTime() - Calendar.getInstance().getTimeInMillis())/(1000 * 60))) / 30);
 
-        SpannableString content = new SpannableString("Total: $" + String.format("%.2f", cost_value));
-        costView.setText(content);
-        costView.setTextSize(40);
-        paymentButton.setVisibility(View.VISIBLE);
+        if(cost_value <= 0) {
+            costView.setText("Please select a valid time");
+            costView.setTextSize(24);
+            cost_value = 0;
+            paymentButton.setVisibility(View.INVISIBLE);
+        } else {
+            SpannableString content = new SpannableString("Total: $" + String.format("%.2f", cost_value));
+            costView.setText(content);
+            costView.setTextSize(40);
+            paymentButton.setVisibility(View.VISIBLE);
 
-        incompletePayment.setVisibility(View.VISIBLE);
+            incompletePayment.setVisibility(View.VISIBLE);
+        }
     }
 
     public void onClickAddTime(View view) {
@@ -213,12 +220,24 @@ public class PayActivity extends ActionBarActivity {
         incompletePayment.setVisibility(View.VISIBLE);
     }
 
+    public void onClickChangeLotSpace(View view) {
+        Intent intent;
+        intent = new Intent(view.getContext(), SelectSpotActivity.class);
+        intent.putExtra("time", selectedTime);
+        startActivity(intent);
+    }
+
     public void onClickPay(View view) {
         Log.d("test", "pay button clicked");
 
         if(cost_value == 0) {
             int duration = Toast.LENGTH_LONG;
             Toast toast = Toast.makeText(PayActivity.this, "Please enter a time after now", duration);
+            toast.show();
+            return;
+        } else if (lotName == null) {
+            int duration = Toast.LENGTH_LONG;
+            Toast toast = Toast.makeText(PayActivity.this, "Please choose a lot and space", duration);
             toast.show();
             return;
         }
@@ -253,6 +272,9 @@ public class PayActivity extends ActionBarActivity {
 
                                 resetSpotButton.setVisibility(View.VISIBLE);
                                 incompletePayment.setVisibility(View.INVISIBLE);
+                                cost_value = 0;
+                                SpannableString content = new SpannableString("Total: $" + String.format("%.2f", cost_value));
+                                costView.setText(content);
 //                                expirationTime.setText("Time expires at: " + new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
 //                                expirationTime.setVisibility(View.VISIBLE);
                                 // TODO: gray out button when the user hasn't added more time yet
@@ -311,9 +333,10 @@ public class PayActivity extends ActionBarActivity {
                                 ApplicationConfig.resetSpot();
                                 int duration = Toast.LENGTH_LONG;
                                 // TODO - charge User this amount
-                                double finalCharge =
-                                        0.70*Math.ceil(((double) ((Calendar.getInstance().getTimeInMillis() -
-                                                ApplicationConfig.getPaidAt().getTime())/(1000 * 60))) / 30);
+                                double finalCharge = 0.70*Math.ceil(((double) ((selectedTime.getTime() - Calendar.getInstance().getTimeInMillis())/(1000 * 60))) / 30);
+//                                double finalCharge =
+//                                        0.70*Math.ceil(((double) ((Calendar.getInstance().getTimeInMillis() -
+//                                                ApplicationConfig.getPaidAt().getTime())/(1000 * 60))) / 30);
                                 Toast toast = Toast.makeText(PayActivity.this, "Cancelation Successful!\n" +
                                         "Total Payment: " + finalCharge, duration);
                                 toast.show();

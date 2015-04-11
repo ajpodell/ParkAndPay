@@ -57,7 +57,7 @@ public class MainActivity extends ActionBarActivity {
             intent.putExtra("spot_num", ApplicationConfig.getSpotTaken());
             intent.putExtra("lot_name", ApplicationConfig.getLotName());
         } else {
-            intent = new Intent(view.getContext(), SelectSpotActivity.class);
+            intent = new Intent(view.getContext(), PayActivity.class);
         }
 
         startActivity(intent);

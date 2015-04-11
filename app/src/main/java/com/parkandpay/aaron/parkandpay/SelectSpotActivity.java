@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Date;
@@ -54,6 +55,9 @@ public class SelectSpotActivity extends ActionBarActivity {
 
     public void createSpotList(final String lot_name){
         //create a list of strings
+        Bundle bundle = getIntent().getExtras();
+        final Long selectedTime = bundle.getLong("time");
+
         final ListView listview = (ListView) findViewById(R.id.availSpotsListView);
         final ArrayList<String> list = new ArrayList<String>();
 
@@ -89,6 +93,7 @@ public class SelectSpotActivity extends ActionBarActivity {
                             Intent intent = new Intent(view.getContext(), PayActivity.class);
                             intent.putExtra("spot_num", item);
                             intent.putExtra("lot_name", lot_name);
+                            intent.putExtra("time", selectedTime);
                             startActivity(intent);
             
                                 
