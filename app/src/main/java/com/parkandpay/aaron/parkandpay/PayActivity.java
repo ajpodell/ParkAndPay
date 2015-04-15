@@ -1,6 +1,7 @@
 package com.parkandpay.aaron.parkandpay;
 
 import android.app.AlertDialog;
+import android.app.Application;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,6 +28,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.text.NumberFormat;
+import java.text.DecimalFormat;
 
 public class PayActivity extends ActionBarActivity {
 
@@ -35,6 +38,7 @@ public class PayActivity extends ActionBarActivity {
     private String lotName;
     private static ParseObject selectedLotObj;
     private static Button paymentButton;
+    private static Button changeLotSpace;
     private static TextView resetSpotButton;
     private static TextView costView;
     private static TextView selectTimeButton;
@@ -59,12 +63,10 @@ public class PayActivity extends ActionBarActivity {
         incompletePayment = (TextView) findViewById(R.id.incompletePayment);
 //        expirationTime = (TextView) findViewById(R.id.expiration_time);
         paymentButton = (Button) findViewById(R.id.availSpotsListView);
-
+        paymentButton.setVisibility(View.VISIBLE);
         incompletePayment.setVisibility(View.INVISIBLE);
         // if the user has already paid for a spot, use the information from that to populate text fields
         if(ApplicationConfig.hasSpot()) {
-//            costView.setVisibility(View.INVISIBLE);
-            paymentButton.setVisibility(View.VISIBLE);
             ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot");
             query.whereEqualTo("Lot_Name", lotName);
             query.whereEqualTo("SpotName", spotNum);
@@ -73,11 +75,9 @@ public class PayActivity extends ActionBarActivity {
                     if(e == null && parseObjects.size() > 0) {
                         ApplicationConfig.setPaidAt((Date)selectedLotObj.get("PaidForAt"));
                         selectedTime = (Date) selectedLotObj.get("PaidForUntil");
-//                        expirationTime.setText("Time expires at: " + new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
-//                        expirationTime.setVisibility(View.VISIBLE);
                         selectTimeButton.setText(new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
-                        // TODO: gray out payment button when the user hasn't added more time yet
-//                        paymentButton.setText("pay for more time");
+                        SpannableString content = new SpannableString("Total: $" + String.format("%.2f", ApplicationConfig.getCost()));
+                        costView.setText(content);
                     } else {
                         System.out.println(e.getMessage());
                         throw new RuntimeException();
@@ -88,13 +88,10 @@ public class PayActivity extends ActionBarActivity {
         // if the user has not paid for a spot, populate text fields with default information
         } else {
             costView.setVisibility(View.VISIBLE);
-
-//            expirationTime.setVisibility(View.INVISIBLE);
             cost_value = 0;
             SpannableString content = new SpannableString("Total: $" + String.format("%.2f", cost_value));
-//            content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
             costView.setText(content);
-            paymentButton.setVisibility(View.VISIBLE);
+
             resetSpotButton.setVisibility(View.INVISIBLE);
             selectedTime = Calendar.getInstance().getTime(); // important because use in later function calls
             selectTimeButton.setText(new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
@@ -105,7 +102,6 @@ public class PayActivity extends ActionBarActivity {
             String spot_text = spotNum;
 
             // set the date and the space number
-//        ((TextView) findViewById(R.id.date_text)).setText(new SimpleDateFormat("MMMM dd", Locale.US).format(Calendar.getInstance().getTime()));
             ((TextView) findViewById(R.id.spot_num_text)).setText(lotName + " Space #" + spot_text);
 
             // Gets the Spot which the Spot Number and Lot Name chosen from the previous Activity
@@ -198,7 +194,11 @@ public class PayActivity extends ActionBarActivity {
 
                     // calculates cost based on the difference of the selected time and the current time.
                     // TODO: change to allow adding time without extra charge... should compare to current time OR time already paid for
-                    cost_value = 0.70*Math.ceil(((double) ((selectedTime.getTime() - Calendar.getInstance().getTimeInMillis())/(1000 * 60))) / 30);
+                    if(ApplicationConfig.hasSpot()) {
+                        cost_value = 0.70*Math.ceil(((double) ((selectedTime.getTime() - ApplicationConfig.getPaidAt().getTime())/(1000 * 60))) / 30);
+                    } else {
+                        cost_value = 0.70*Math.ceil(((double) ((selectedTime.getTime() - Calendar.getInstance().getTimeInMillis())/(1000 * 60))) / 30);
+                    }
                     if(cost_value <= 0) {
                         costView.setText("Please select a valid time");
                         costView.setTextSize(24);
@@ -269,11 +269,14 @@ public class PayActivity extends ActionBarActivity {
                             if (e == null) {
                                 // saved successfully
                                 Log.d("test", "parse object saved");
-
+                                // TODO - checkpoint
                                 resetSpotButton.setVisibility(View.VISIBLE);
                                 incompletePayment.setVisibility(View.INVISIBLE);
+                                ApplicationConfig.resetCost();
+                                ApplicationConfig.addCost(cost_value);
+                                ApplicationConfig.setPaidAt(new Date());
                                 cost_value = 0;
-                                SpannableString content = new SpannableString("Total: $" + String.format("%.2f", cost_value));
+                                SpannableString content = new SpannableString("Total: $" + String.format("%.2f", ApplicationConfig.getCost()));
                                 costView.setText(content);
 //                                expirationTime.setText("Time expires at: " + new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
 //                                expirationTime.setVisibility(View.VISIBLE);
@@ -317,7 +320,9 @@ public class PayActivity extends ActionBarActivity {
 
         // fields for the reset dialog
         AlertDialog.Builder resetDialog = new AlertDialog.Builder(this);
-        resetDialog.setMessage("Are you sure you want to cancel your reservation?");
+        NumberFormat formatter = new DecimalFormat("#0.00");
+        String message = "Are you sure you want to cancel your reservation?\nTotal cost: $" + formatter.format(ApplicationConfig.getCost());
+        resetDialog.setMessage(message);
         resetDialog.setCancelable(true);
 
         // if yes is selected, will cancel payment and update parse information
@@ -333,13 +338,13 @@ public class PayActivity extends ActionBarActivity {
                                 ApplicationConfig.resetSpot();
                                 int duration = Toast.LENGTH_LONG;
                                 // TODO - charge User this amount
-                                double finalCharge = 0.70*Math.ceil(((double) ((selectedTime.getTime() - Calendar.getInstance().getTimeInMillis())/(1000 * 60))) / 30);
-//                                double finalCharge =
-//                                        0.70*Math.ceil(((double) ((Calendar.getInstance().getTimeInMillis() -
-//                                                ApplicationConfig.getPaidAt().getTime())/(1000 * 60))) / 30);
+                                double finalCharge =
+                                0.70*Math.ceil(((double) ((selectedTime.getTime() - Calendar.getInstance().getTimeInMillis())/(1000 * 60))) / 30);
+                                NumberFormat formatter = new DecimalFormat("#0.00");
                                 Toast toast = Toast.makeText(PayActivity.this, "Cancelation Successful!\n" +
-                                        "Total Payment: " + finalCharge, duration);
+                                        "Total Payment: $" + formatter.format(finalCharge), duration);
                                 toast.show();
+                                ApplicationConfig.resetCost();
                                 startActivity(new Intent(PayActivity.this, MainActivity.class));
                             } else {
                                 throw new RuntimeException();

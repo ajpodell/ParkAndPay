@@ -13,6 +13,7 @@ public class ApplicationConfig extends Application {
     private static String spotTaken = "";
     private static String lotName = "";
     private static Date paidAt = null;
+    private static double totalCost = 0.0;
 
     @Override
     public void onCreate() {
@@ -72,5 +73,10 @@ public class ApplicationConfig extends Application {
             resetSpot();
         }
     }
+
+    public static void addCost(double cost) { totalCost += cost; }
+    public static void reduceCost(double reduction) { totalCost -= reduction; }
+    public static double getCost() { return totalCost; }
+    public static void resetCost() { totalCost = 0; }
 
 }

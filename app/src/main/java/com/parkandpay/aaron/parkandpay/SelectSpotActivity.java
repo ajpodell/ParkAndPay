@@ -56,7 +56,8 @@ public class SelectSpotActivity extends ActionBarActivity {
     public void createSpotList(final String lot_name){
         //create a list of strings
         Bundle bundle = getIntent().getExtras();
-        final Long selectedTime = bundle.getLong("time");
+        // final Long selectedTime = bundle.getLong("time");
+        final Long selectedTime = 1L;
 
         final ListView listview = (ListView) findViewById(R.id.availSpotsListView);
         final ArrayList<String> list = new ArrayList<String>();
