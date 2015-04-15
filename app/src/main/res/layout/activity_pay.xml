@@ -76,19 +76,35 @@
         android:layout_alignParentEnd="true" />
 
     <!--TODO: Make this actually do something-->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=" + Change lot or space"
-        android:onClick="onClickChangeLotSpace"
-        android:id="@+id/change_lot_space"
-        android:textColor="@color/observatory_white"
-        android:paddingTop="15dp"
-        android:textSize="28sp"
-        android:textIsSelectable="true"
-        android:layout_below="@+id/add_30_minutes"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text=" + Change lot or space"-->
+        <!--android:onClick="onClickChangeLotSpace"-->
+        <!--android:id="@+id/change_lot_space"-->
+        <!--android:textColor="@color/observatory_white"-->
+        <!--android:paddingTop="15dp"-->
+        <!--android:textSize="28sp"-->
+        <!--android:textIsSelectable="true"-->
+        <!--android:layout_below="@+id/add_30_minutes"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_alignParentStart="true" />-->
+
+
+    <!--<Button-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text=" + Change lot or space"-->
+    <!--android:onClick="onClickChangeLotSpace"-->
+    <!--android:id="@+id/change_lot_space"-->
+    <!--android:textColor="@color/observatory_white"-->
+    <!--android:paddingTop="15dp"-->
+    <!--android:textSize="28sp"-->
+    <!--android:textIsSelectable="true"-->
+    <!--android:layout_below="@+id/add_30_minutes"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_alignParentStart="true" />-->
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -100,7 +116,7 @@
         android:paddingTop="15dp"
         android:textSize="28sp"
         android:textIsSelectable="true"
-        android:layout_below="@+id/change_lot_space"
+        android:layout_below="@+id/add_30_minutes"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 

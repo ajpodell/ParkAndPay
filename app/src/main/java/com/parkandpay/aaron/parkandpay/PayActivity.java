@@ -38,7 +38,7 @@ public class PayActivity extends ActionBarActivity {
     private String lotName;
     private static ParseObject selectedLotObj;
     private static Button paymentButton;
-    private static Button changeLotSpace;
+    //private static TextView changeLotSpace;
     private static TextView resetSpotButton;
     private static TextView costView;
     private static TextView selectTimeButton;
@@ -57,6 +57,8 @@ public class PayActivity extends ActionBarActivity {
             spotNum = bundle.getString("spot_num");
             lotName = bundle.getString("lot_name");
         }
+
+        // Initialize our View elements
         resetSpotButton = (TextView) findViewById(R.id.resetSpotButton);
         costView = (TextView) findViewById(R.id.cost);
         selectTimeButton = (TextView) findViewById(R.id.time_remaining_text);
@@ -65,6 +67,7 @@ public class PayActivity extends ActionBarActivity {
         paymentButton = (Button) findViewById(R.id.availSpotsListView);
         paymentButton.setVisibility(View.VISIBLE);
         incompletePayment.setVisibility(View.INVISIBLE);
+        //changeLotSpace = (TextView) findViewById(R.id.change_lot_space);
         // if the user has already paid for a spot, use the information from that to populate text fields
         if(ApplicationConfig.hasSpot()) {
             ParseQuery<ParseObject> query = ParseQuery.getQuery("ParkingSpot");
@@ -78,6 +81,7 @@ public class PayActivity extends ActionBarActivity {
                         selectTimeButton.setText(new SimpleDateFormat("hh:mm a", Locale.US).format(selectedTime));
                         SpannableString content = new SpannableString("Total: $" + String.format("%.2f", ApplicationConfig.getCost()));
                         costView.setText(content);
+                        //changeLotSpace.setVisibility(View.INVISIBLE);
                     } else {
                         System.out.println(e.getMessage());
                         throw new RuntimeException();
